@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1025680611513",
+    "project_id": "vistafeedd",
+    "storage_bucket": "vistafeedd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1025680611513:android:d34532cd5ae50ff31ea368",
+        "android_client_info": {
+          "package_name": "com.example.vistafeedd"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6NjVZRN9pMg8FyHuWaTM6YCgAPo6jYv4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
