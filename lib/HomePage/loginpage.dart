@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:video_player/video_player.dart';
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -16,6 +16,50 @@ class _LoginPageState extends State<LoginPage> {
 ''';
   bool showpassword=false;
   bool isloading=false;
+  late VideoPlayerController _controller1;
+  late VideoPlayerController _controller2;
+  late VideoPlayerController _controller3;
+  late VideoPlayerController _controller4;
+  void initState() {
+    super.initState();
+    _controller1 = VideoPlayerController.networkUrl(Uri.parse(
+        'https://videos.ctfassets.net/inb32lme5009/3blBBSbEfm9vVY4EvqWrcV/611d691c67340e76cb471491c792a988/Section_2JavyCoffee.mp4'))
+      ..initialize().then((_) {
+        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+        setState(() {
+          _controller1.setLooping(true);  // Enable looping
+          _controller1.play();
+        });
+      });
+    _controller2 = VideoPlayerController.networkUrl(Uri.parse(
+        'https://videos.ctfassets.net/inb32lme5009/34ca6VPJhXCkcpJfPYyQL/29709124985abb089d1042d51157edc5/Section_3YoungLA.mp4'))
+      ..initialize().then((_) {
+        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+        setState(() {
+          _controller2.setLooping(true);  // Enable looping
+          _controller2.play();
+        });
+      });
+    _controller3 = VideoPlayerController.networkUrl(Uri.parse(
+        'https://videos.ctfassets.net/inb32lme5009/2Xi6NUEtv8wTyfVbYZFV8b/c0ba37fc46e3aa87182231b9fe43c816/Section_2TalkSpace.mp4'))
+      ..initialize().then((_) {
+        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+        setState(() {
+          _controller3.setLooping(true);  // Enable looping
+          _controller3.play();
+        });
+      });
+    _controller4 = VideoPlayerController.networkUrl(Uri.parse(
+        'https://static.snapchat.com/videos/snapchat-dot-com/map.mp4'))
+      ..initialize().then((_) {
+        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+        setState(() {
+          _controller4.setLooping(true);  // Enable looping
+          _controller4.play();
+        });
+      });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -162,6 +206,63 @@ class _LoginPageState extends State<LoginPage> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
+                  ),
+                  const SizedBox(
+                    height: 40,
+                  ),
+                  Image.network('https://static.snapchat.com/images/snapchatdotcom/Homepage+Bitmojis.png'),
+                  Center(
+                    child: _controller1.value.isInitialized
+                        ? Container(
+                      width:MediaQuery.sizeOf(context).width,
+                      child: AspectRatio(
+                        aspectRatio: _controller1.value.aspectRatio,
+                        child: VideoPlayer(_controller1),
+                      ),
+                    )
+                        : Container(),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Center(
+                    child: _controller2.value.isInitialized
+                        ? Container(
+                      width:MediaQuery.sizeOf(context).width,
+                      child: AspectRatio(
+                        aspectRatio: _controller2.value.aspectRatio,
+                        child: VideoPlayer(_controller2),
+                      ),
+                    )
+                        : Container(),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Center(
+                    child: _controller3.value.isInitialized
+                        ? Container(
+                      width:MediaQuery.sizeOf(context).width,
+                      child: AspectRatio(
+                        aspectRatio: _controller3.value.aspectRatio,
+                        child: VideoPlayer(_controller3),
+                      ),
+                    )
+                        : Container(),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Center(
+                    child: _controller4.value.isInitialized
+                        ? Container(
+                      width:MediaQuery.sizeOf(context).width,
+                      child: AspectRatio(
+                        aspectRatio: _controller4.value.aspectRatio,
+                        child: VideoPlayer(_controller4),
+                      ),
+                    )
+                        : Container(),
                   ),
                 ],
               ),
