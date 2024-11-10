@@ -17,12 +17,14 @@ class _ProfilePageState extends State<ProfilePage> {
   final FirebaseAuth _auth=FirebaseAuth.instance;
   String pfp='';
   String usernames='';
+  String bio='';
   Future<void> fetchpfp()async{
     final docsnap=await _firestore.collection('User Details').doc(_auth.currentUser!.uid).get();
     if(docsnap.exists){
       setState(() {
         pfp=docsnap.data()?['Profile Pic'];
         usernames=docsnap.data()?['Name'];
+        bio=docsnap.data()?['Bio'];
       });
     }
   }
@@ -223,7 +225,55 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 Text(usernames,style: GoogleFonts.poppins(color: Colors.white),)
               ],
-            )
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              children: [
+                const SizedBox(
+                  width: 30,
+                ),
+                Text(bio,style: GoogleFonts.poppins(color: Colors.white),)
+              ],
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                // const SizedBox(
+                //   width: 30,
+                // ),
+                Container(
+                  height: 35,
+                  width: MediaQuery.sizeOf(context).width/2.5,
+                  decoration: const BoxDecoration(
+                    color: Color.fromRGBO(54, 54, 54, 7),
+                    borderRadius: BorderRadius.all(Radius.circular(10))
+                  ),
+                  child: Center(
+                    child: Text('Edit Profile',style: GoogleFonts.poppins(
+                      color: Colors.white
+                    ),),
+                  ),
+                ),
+                Container(
+                  height: 35,
+                  width: MediaQuery.sizeOf(context).width/2.5,
+                  decoration: const BoxDecoration(
+                      color: Color.fromRGBO(54, 54, 54, 7),
+                      borderRadius: BorderRadius.all(Radius.circular(10))
+                  ),
+                  child: Center(
+                    child: Text('Share Profile',style: GoogleFonts.poppins(
+                        color: Colors.white
+                    ),),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
