@@ -41,6 +41,9 @@ class _HomePageState extends State<HomePage> {
         following = docsnap.data()?['Following ID'] ?? [];
       });
     }
+    setState(() {
+      _isLoading = false;
+    });
     if (kDebugMode) {
       print('Following: $following');
     }
@@ -60,7 +63,9 @@ class _HomePageState extends State<HomePage> {
 
         });
       }
-
+      setState(() {
+        _isLoading = false;
+      });
       if (kDebugMode) {
         print('PIDs: $postID');
       }
@@ -90,6 +95,7 @@ class _HomePageState extends State<HomePage> {
             tempPostCaption.add(postdata.data()?['Caption'] ?? '');
             tempPostDate.add(postdata.data()?['Upload Date'] ?? '');
           }
+
         }
       }
 
@@ -100,7 +106,9 @@ class _HomePageState extends State<HomePage> {
         postdate = tempPostDate;
         PID=temppostid;
       });
-
+      setState(() {
+        _isLoading = false;
+      });
       if (kDebugMode) {
         print('Posts fetched: ${postimages.length}');
       }
@@ -127,6 +135,9 @@ class _HomePageState extends State<HomePage> {
       if (kDebugMode) {
         print('Verified $verification');
       }
+      setState(() {
+        _isLoading = false;
+      });
     } catch (e) {
       if (kDebugMode) {
         print("User details error: $e");
@@ -181,6 +192,9 @@ class _HomePageState extends State<HomePage> {
     if (kDebugMode) {
       print('Liked: $isliked');
     } // Should now print true/false values
+    setState(() {
+      _isLoading = false;
+    });
   }
   List<dynamic> savedposts = [];
 
@@ -195,6 +209,9 @@ class _HomePageState extends State<HomePage> {
     if (kDebugMode) {
       print('Saved $savedposts');
     }
+    setState(() {
+      _isLoading = false;
+    });
   }
   @override
   void initState() {
