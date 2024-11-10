@@ -108,8 +108,9 @@ class _SignupPageState extends State<SignupPage> {
         });
         await _auth.createUserWithEmailAndPassword(email: _EmailController.text, password: _passwordController.text);
         await _firestore.collection('User Names').doc('usernames').set({
-          'usernames':_UsernameController.text
-        },SetOptions(merge: true));
+          'usernames': FieldValue.arrayUnion([_UsernameController.text])
+        }, SetOptions(merge: true));
+
         await _firestore.collection('User Details').doc(_auth.currentUser!.uid).set(
             {
               'Applied For Verification':false,
