@@ -18,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     // Add a delay of 5 seconds before navigating to the next page
-    Future.delayed(const Duration(seconds: 10), () {
+    Future.delayed(const Duration(seconds: 5), () {
       // Navigate to the next page (replace 'NextPage()' with your actual next page)
       Navigator.pushReplacement(
         context,

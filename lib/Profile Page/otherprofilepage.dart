@@ -7,15 +7,15 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:vistafeedd/HomePage/homepage.dart';
 import 'package:video_player/video_player.dart';
 import 'package:vistafeedd/Post%20Details%20Page/postdetails.dart';
-class ProfilePage extends StatefulWidget {
+class OtherProfilePage extends StatefulWidget {
   final String userid;
-  ProfilePage({required this.userid});
+  OtherProfilePage({required this.userid});
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  State<OtherProfilePage> createState() => _OtherProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _OtherProfilePageState extends State<OtherProfilePage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   String pfp = '';
@@ -71,7 +71,7 @@ class _ProfilePageState extends State<ProfilePage> {
       });
     }
     if (kDebugMode) {
-      print('Follower: $followers');
+      print('Follower owner: $followers');
     }
   }
 
@@ -80,11 +80,11 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> fetchPosts() async {
     List<dynamic> postIDList = [];
     List<dynamic> matchingPostIds =
-        []; // To store multiple matching post IDs if needed
+    []; // To store multiple matching post IDs if needed
     List<dynamic> matchingPostImages = [];
 
     final docSnap =
-        await _firestore.collection('Global Post IDs').doc('Posts').get();
+    await _firestore.collection('Global Post IDs').doc('Posts').get();
     if (docSnap.exists) {
       postIDList = docSnap.data()?['Post IDs'] ?? [];
     }
@@ -95,7 +95,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     for (String postId in postIDList) {
       final postSnap =
-          await _firestore.collection('Global Post').doc(postId).get();
+      await _firestore.collection('Global Post').doc(postId).get();
       if (postSnap.exists) {
         if (postSnap.data()?['Uploaded UID'] == widget.userid) {
           matchingPostIds.add(postSnap.data()?['postid']);
@@ -136,7 +136,7 @@ class _ProfilePageState extends State<ProfilePage> {
       final postSnap =
       await _firestore.collection('Global Reels').doc(postId).get();
       if (postSnap.exists) {
-        if (postSnap.data()?['Uploaded UID'] == _auth.currentUser?.uid) {
+        if (postSnap.data()?['Uploaded UID'] == widget.userid) {
           matchingPostIds.add(postSnap.data()?['reelid']);
           matchingPostImages.add(postSnap.data()?['Video ID']);
           matchingreelImages.add(postSnap.data()?['Thumbnail']);
@@ -171,35 +171,6 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              InkWell(
-                onTap: (){},
-                child: SizedBox(
-                  height: 22,
-                  width: 22,
-                  child: SvgPicture.string('<svg aria-label="New post" class="x1lliihq x1n2onr6 x5n08af" fill="white" height="24" role="img" viewBox="0 0 24 24" width="24"><title>New post</title><path d="M2 12v3.45c0 2.849.698 4.005 1.606 4.944.94.909 2.098 1.608 4.946 1.608h6.896c2.848 0 4.006-.7 4.946-1.608C21.302 19.455 22 18.3 22 15.45V8.552c0-2.849-.698-4.006-1.606-4.945C19.454 2.7 18.296 2 15.448 2H8.552c-2.848 0-4.006.699-4.946 1.607C2.698 4.547 2 5.703 2 8.552Z" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><line fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="6.545" x2="17.455" y1="12.001" y2="12.001"></line><line fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="12.003" x2="12.003" y1="6.545" y2="17.455"></line></svg>'),
-                ),
-              ),
-              const SizedBox(
-                width: 20,
-              ),
-              InkWell(
-                onTap: (){},
-                child: SizedBox(
-                  height: 22,
-                  width: 22,
-                  child: SvgPicture.string('<svg aria-label="Settings" class="x1lliihq x1n2onr6 x5n08af" fill="white" height="24" role="img" viewBox="0 0 24 24" width="24"><title>Settings</title><line fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="3" x2="21" y1="4" y2="4"></line><line fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="3" x2="21" y1="12" y2="12"></line><line fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="3" x2="21" y1="20" y2="20"></line></svg>'),
-                ),
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-            ],
-          )
-        ],
         backgroundColor: Colors.black,
         automaticallyImplyLeading: false,
         title: Row(
@@ -207,11 +178,11 @@ class _ProfilePageState extends State<ProfilePage> {
           children: [
             isprivate
                 ? SizedBox(
-                    height: 18,
-                    width: 18,
-                    child: SvgPicture.string(
-                        '<svg xmlns="http://www.w3.org/2000/svg" fill="#FFFFFF" viewBox="0 0 50 50" width="20px" height="20px"><path d="M 25 3 C 18.363281 3 13 8.363281 13 15 L 13 20 L 9 20 C 7.355469 20 6 21.355469 6 23 L 6 47 C 6 48.644531 7.355469 50 9 50 L 41 50 C 42.644531 50 44 48.644531 44 47 L 44 23 C 44 21.355469 42.644531 20 41 20 L 37 20 L 37 15 C 37 8.363281 31.636719 3 25 3 Z M 25 5 C 30.566406 5 35 9.433594 35 15 L 35 20 L 15 20 L 15 15 C 15 9.433594 19.433594 5 25 5 Z M 9 22 L 41 22 C 41.554688 22 42 22.445313 42 23 L 42 47 C 42 47.554688 41.554688 48 41 48 L 9 48 C 8.445313 48 8 47.554688 8 47 L 8 23 C 8 22.445313 8.445313 22 9 22 Z M 25 30 C 23.300781 30 22 31.300781 22 33 C 22 33.898438 22.398438 34.6875 23 35.1875 L 23 38 C 23 39.101563 23.898438 40 25 40 C 26.101563 40 27 39.101563 27 38 L 27 35.1875 C 27.601563 34.6875 28 33.898438 28 33 C 28 31.300781 26.699219 30 25 30 Z"/></svg>'),
-                  )
+              height: 18,
+              width: 18,
+              child: SvgPicture.string(
+                  '<svg xmlns="http://www.w3.org/2000/svg" fill="#FFFFFF" viewBox="0 0 50 50" width="20px" height="20px"><path d="M 25 3 C 18.363281 3 13 8.363281 13 15 L 13 20 L 9 20 C 7.355469 20 6 21.355469 6 23 L 6 47 C 6 48.644531 7.355469 50 9 50 L 41 50 C 42.644531 50 44 48.644531 44 47 L 44 23 C 44 21.355469 42.644531 20 41 20 L 37 20 L 37 15 C 37 8.363281 31.636719 3 25 3 Z M 25 5 C 30.566406 5 35 9.433594 35 15 L 35 20 L 15 20 L 15 15 C 15 9.433594 19.433594 5 25 5 Z M 9 22 L 41 22 C 41.554688 22 42 22.445313 42 23 L 42 47 C 42 47.554688 41.554688 48 41 48 L 9 48 C 8.445313 48 8 47.554688 8 47 L 8 23 C 8 22.445313 8.445313 22 9 22 Z M 25 30 C 23.300781 30 22 31.300781 22 33 C 22 33.898438 22.398438 34.6875 23 35.1875 L 23 38 C 23 39.101563 23.898438 40 25 40 C 26.101563 40 27 39.101563 27 38 L 27 35.1875 C 27.601563 34.6875 28 33.898438 28 33 C 28 31.300781 26.699219 30 25 30 Z"/></svg>'),
+            )
                 : Container(),
             const SizedBox(
               width: 10,
@@ -379,11 +350,11 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     isverified
                         ? const SizedBox(
-                            width: 15,
-                            height: 15,
-                            child: Image(
-                                image: NetworkImage(
-                                    'https://firebasestorage.googleapis.com/v0/b/vistafeedd.appspot.com/o/Assets%2Ficons8-verified-badge-48.png?alt=media&token=db0c0b9f-2f66-4401-a60b-11268ef68b2b')))
+                        width: 15,
+                        height: 15,
+                        child: Image(
+                            image: NetworkImage(
+                                'https://firebasestorage.googleapis.com/v0/b/vistafeedd.appspot.com/o/Assets%2Ficons8-verified-badge-48.png?alt=media&token=db0c0b9f-2f66-4401-a60b-11268ef68b2b')))
                         : Container()
                   ],
                 )
@@ -415,12 +386,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 Container(
                   height: 35,
                   width: MediaQuery.sizeOf(context).width / 2.5,
-                  decoration: const BoxDecoration(
-                      color: Color.fromRGBO(54, 54, 54, 7),
+                  decoration:  BoxDecoration(
+                      color:!followers.contains(_auth.currentUser!.uid)?Color.fromRGBO(0, 149, 246, 7): Color.fromRGBO(54, 54, 54, 7),
                       borderRadius: BorderRadius.all(Radius.circular(10))),
                   child: Center(
                     child: Text(
-                      'Edit Profile',
+                      !followers.contains(_auth.currentUser!.uid)?'Follow':'Following',
                       style: GoogleFonts.poppins(color: Colors.white),
                     ),
                   ),
@@ -433,7 +404,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       borderRadius: BorderRadius.all(Radius.circular(10))),
                   child: Center(
                     child: Text(
-                      'Share Profile',
+                      'Message',
                       style: GoogleFonts.poppins(color: Colors.white),
                     ),
                   ),
@@ -452,35 +423,35 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: Column(
                       children: [
                         InkWell(
-                          onTap:(){
-                            setState(() {
-                              if(!ispostsecttion){
-                                setState(() {
-                                  ispostsecttion=true;
-                                  isreelsection=false;
-                                  istaggedsection=false;
-                                });
-                              }
-                            });
-                          },
-                          child: SvgPicture.string(
-                             ispostsecttion? '<svg aria-label="" class="x1lliihq x1n2onr6 x5n08af" fill="white" '
-                                 'height="40" role="img" viewBox="0 0 24 24" width="40"><title></title><rect fill="none" height="18"'
-                                 ' stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" width="18" x="3" y="3">'
-                                 '</rect><line fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" '
-                                 'x1="9.015" x2="9.015" y1="3" y2="21"></line><line fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round"'
-                                 ' stroke-width="2" x1="14.985" x2="14.985" y1="3" y2="21"></line><line fill="none" stroke="white" stroke-linecap="round" '
-                                 'stroke-linejoin="round" stroke-width="2" x1="21" x2="3" y1="9.015" y2="9.015"></line><line fill="none" stroke="white" '
-                                 'stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="21" x2="3" y1="14.985" y2="14.985"></line></svg>':
-                             '<svg aria-label="" class="x1lliihq x1n2onr6 x5n08af" fill="#A5A4A1" '
-                                 'height="40" role="img" viewBox="0 0 24 24" width="40"><title></title><rect fill="none" height="18"'
-                                 ' stroke="#A5A4A1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" width="18" x="3" y="3">'
-                                 '</rect><line fill="none" stroke="#A5A4A1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" '
-                                 'x1="9.015" x2="9.015" y1="3" y2="21"></line><line fill="none" stroke="#A5A4A1" stroke-linecap="round" stroke-linejoin="round"'
-                                 ' stroke-width="2" x1="14.985" x2="14.985" y1="3" y2="21"></line><line fill="none" stroke="#A5A4A1" stroke-linecap="round" '
-                                 'stroke-linejoin="round" stroke-width="2" x1="21" x2="3" y1="9.015" y2="9.015"></line><line fill="none" stroke="#A5A4A1" '
-                                 'stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="21" x2="3" y1="14.985" y2="14.985"></line></svg>'
-                          )
+                            onTap:(){
+                              setState(() {
+                                if(!ispostsecttion){
+                                  setState(() {
+                                    ispostsecttion=true;
+                                    isreelsection=false;
+                                    istaggedsection=false;
+                                  });
+                                }
+                              });
+                            },
+                            child: SvgPicture.string(
+                                ispostsecttion? '<svg aria-label="" class="x1lliihq x1n2onr6 x5n08af" fill="white" '
+                                    'height="40" role="img" viewBox="0 0 24 24" width="40"><title></title><rect fill="none" height="18"'
+                                    ' stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" width="18" x="3" y="3">'
+                                    '</rect><line fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" '
+                                    'x1="9.015" x2="9.015" y1="3" y2="21"></line><line fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round"'
+                                    ' stroke-width="2" x1="14.985" x2="14.985" y1="3" y2="21"></line><line fill="none" stroke="white" stroke-linecap="round" '
+                                    'stroke-linejoin="round" stroke-width="2" x1="21" x2="3" y1="9.015" y2="9.015"></line><line fill="none" stroke="white" '
+                                    'stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="21" x2="3" y1="14.985" y2="14.985"></line></svg>':
+                                '<svg aria-label="" class="x1lliihq x1n2onr6 x5n08af" fill="#A5A4A1" '
+                                    'height="40" role="img" viewBox="0 0 24 24" width="40"><title></title><rect fill="none" height="18"'
+                                    ' stroke="#A5A4A1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" width="18" x="3" y="3">'
+                                    '</rect><line fill="none" stroke="#A5A4A1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" '
+                                    'x1="9.015" x2="9.015" y1="3" y2="21"></line><line fill="none" stroke="#A5A4A1" stroke-linecap="round" stroke-linejoin="round"'
+                                    ' stroke-width="2" x1="14.985" x2="14.985" y1="3" y2="21"></line><line fill="none" stroke="#A5A4A1" stroke-linecap="round" '
+                                    'stroke-linejoin="round" stroke-width="2" x1="21" x2="3" y1="9.015" y2="9.015"></line><line fill="none" stroke="#A5A4A1" '
+                                    'stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="21" x2="3" y1="14.985" y2="14.985"></line></svg>'
+                            )
 
                         )
                         // const SizedBox(
@@ -499,15 +470,15 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: InkWell(
                     onTap: () {
                       if(!isreelsection){
-                       setState(() {
-                         ispostsecttion=false;
-                         isreelsection=true;
-                         istaggedsection=false;
-                       });
+                        setState(() {
+                          ispostsecttion=false;
+                          isreelsection=true;
+                          istaggedsection=false;
+                        });
                       }
                     },
                     child: SvgPicture.string(
-                       !isreelsection? '<svg aria-label="Reels" class="x1lliihq x1n2onr6 x5n08af" fill="#A5A4A1" '
+                        !isreelsection? '<svg aria-label="Reels" class="x1lliihq x1n2onr6 x5n08af" fill="#A5A4A1" '
                             'height="24" role="img" viewBox="0 0 24 24" width="24"><title>Reels</title>'
                             '<line fill="none" stroke="#A5A4A1" stroke-linejoin="round" stroke-width="2" x1="2.049" x2="21.95"'
                             ' y1="7.002" y2="7.002"></line><line fill="none" stroke="#A5A4A1" stroke-linecap="round" stroke-linejoin="round"'
@@ -518,24 +489,24 @@ class _ProfilePageState extends State<ProfilePage> {
                             '48 0-4.006.699-4.946 1.607C2.698 4.546 2 5.704 2 8.552Z" fill="none" stroke="#A5A4A1" stroke-linecap="round" stroke-linejoin="round" '
                             'stroke-width="2"></path><path d="M9.763 17.664a.908.908 0 0 1-.454-.787V11.63a.909.909 0 0 1 1.364-.788l4.545 2.624a.909.909 0 0 1 '
                             '0 1.575l-4.545 2.624a.91.91 0 0 1-.91 0Z" fill-rule="evenodd"></path></svg>':
-                       '<svg aria-label="Reels" class="x1lliihq x1n2onr6 x5n08af" fill="white" '
-                           'height="24" role="img" viewBox="0 0 24 24" width="24"><title>Reels</title>'
-                           '<line fill="none" stroke="white" stroke-linejoin="round" stroke-width="2" x1="2.049" x2="21.95"'
-                           ' y1="7.002" y2="7.002"></line><line fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round"'
-                           ' stroke-width="2" x1="13.504" x2="16.362" y1="2.001" y2="7.002"></line><line fill="none" stroke="white" '
-                           'stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="7.207" x2="10.002" y1="2.11" y2="7.002">'
-                           '</line><path d="M2 12.001v3.449c0 2.849.698 4.006 1.606 4.945.94.908 2.098 1.607 4.946 1.607h6.896c2.848 0 4.006-.699 4.'
-                           '946-1.607.908-.939 1.606-2.096 1.606-4.945V8.552c0-2.848-.698-4.006-1.606-4.945C19.454 2.699 18.296 2 15.448 2H8.552c-2.8'
-                           '48 0-4.006.699-4.946 1.607C2.698 4.546 2 5.704 2 8.552Z" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" '
-                           'stroke-width="2"></path><path d="M9.763 17.664a.908.908 0 0 1-.454-.787V11.63a.909.909 0 0 1 1.364-.788l4.545 2.624a.909.909 0 0 1 '
-                           '0 1.575l-4.545 2.624a.91.91 0 0 1-.91 0Z" fill-rule="evenodd"></path></svg>'
+                        '<svg aria-label="Reels" class="x1lliihq x1n2onr6 x5n08af" fill="white" '
+                            'height="24" role="img" viewBox="0 0 24 24" width="24"><title>Reels</title>'
+                            '<line fill="none" stroke="white" stroke-linejoin="round" stroke-width="2" x1="2.049" x2="21.95"'
+                            ' y1="7.002" y2="7.002"></line><line fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round"'
+                            ' stroke-width="2" x1="13.504" x2="16.362" y1="2.001" y2="7.002"></line><line fill="none" stroke="white" '
+                            'stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="7.207" x2="10.002" y1="2.11" y2="7.002">'
+                            '</line><path d="M2 12.001v3.449c0 2.849.698 4.006 1.606 4.945.94.908 2.098 1.607 4.946 1.607h6.896c2.848 0 4.006-.699 4.'
+                            '946-1.607.908-.939 1.606-2.096 1.606-4.945V8.552c0-2.848-.698-4.006-1.606-4.945C19.454 2.699 18.296 2 15.448 2H8.552c-2.8'
+                            '48 0-4.006.699-4.946 1.607C2.698 4.546 2 5.704 2 8.552Z" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" '
+                            'stroke-width="2"></path><path d="M9.763 17.664a.908.908 0 0 1-.454-.787V11.63a.909.909 0 0 1 1.364-.788l4.545 2.624a.909.909 0 0 1 '
+                            '0 1.575l-4.545 2.624a.91.91 0 0 1-.91 0Z" fill-rule="evenodd"></path></svg>'
                     ),
                   ),
                 ),
                 SizedBox(
-                    height: 25,
-                    width: 25,
-                    child:InkWell(
+                  height: 25,
+                  width: 25,
+                  child:InkWell(
                       onTap: (){
                         if(!istaggedsection){
                           setState(() {
@@ -546,25 +517,25 @@ class _ProfilePageState extends State<ProfilePage> {
                         }
                       },
                       child: SvgPicture.string(
-                         !istaggedsection? '<svg aria-label="" class="x1lliihq x1n2onr6 x1roi4f4" fill="#A5A4A1" height="12" role="img" viewBox="0 0 24 24"'
+                          !istaggedsection? '<svg aria-label="" class="x1lliihq x1n2onr6 x1roi4f4" fill="#A5A4A1" height="12" role="img" viewBox="0 0 24 24"'
                               ' width="12"><title></title><path d="M10.201 3.797 12 1.997l1.799 1.8a1.59 1.59 0 0 0 1.124.465h5.259A1.818 1.'
                               '818 0 0 1 22 6.08v14.104a1.818 1.818 0 0 1-1.818 1.818H3.818A1.818 1.818 0 0 1 2 20.184V6.08a1.818 1.818 0 0 1 1.818-1.'
                               '818h5.26a1.59 1.59 0 0 0 1.123-.465Z" fill="none" stroke="#A5A4A1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">'
                               '</path><path d="M18.598 22.002V21.4a3.949 3.949 0 0 0-3.948-3.949H9.495A3.949 3.949 0 0 0 5.546 21.4v.603" fill="none" stroke="#A5A4A1"'
                               ' stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><circle cx="12.072" cy="11.075" fill="none" r="3.556"'
                               ' stroke="#A5A4A1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></circle></svg>':
-                         '<svg aria-label="" class="x1lliihq x1n2onr6 x1roi4f4" fill="white" height="12" role="img" viewBox="0 0 24 24"'
-                             ' width="12"><title></title><path d="M10.201 3.797 12 1.997l1.799 1.8a1.59 1.59 0 0 0 1.124.465h5.259A1.818 1.'
-                             '818 0 0 1 22 6.08v14.104a1.818 1.818 0 0 1-1.818 1.818H3.818A1.818 1.818 0 0 1 2 20.184V6.08a1.818 1.818 0 0 1 1.818-1.'
-                             '818h5.26a1.59 1.59 0 0 0 1.123-.465Z" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">'
-                             '</path><path d="M18.598 22.002V21.4a3.949 3.949 0 0 0-3.948-3.949H9.495A3.949 3.949 0 0 0 5.546 21.4v.603" fill="none" stroke="white"'
-                             ' stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><circle cx="12.072" cy="11.075" fill="none" r="3.556"'
-                             ' stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></circle></svg>'
+                          '<svg aria-label="" class="x1lliihq x1n2onr6 x1roi4f4" fill="white" height="12" role="img" viewBox="0 0 24 24"'
+                              ' width="12"><title></title><path d="M10.201 3.797 12 1.997l1.799 1.8a1.59 1.59 0 0 0 1.124.465h5.259A1.818 1.'
+                              '818 0 0 1 22 6.08v14.104a1.818 1.818 0 0 1-1.818 1.818H3.818A1.818 1.818 0 0 1 2 20.184V6.08a1.818 1.818 0 0 1 1.818-1.'
+                              '818h5.26a1.59 1.59 0 0 0 1.123-.465Z" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">'
+                              '</path><path d="M18.598 22.002V21.4a3.949 3.949 0 0 0-3.948-3.949H9.495A3.949 3.949 0 0 0 5.546 21.4v.603" fill="none" stroke="white"'
+                              ' stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><circle cx="12.072" cy="11.075" fill="none" r="3.556"'
+                              ' stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></circle></svg>'
                       ))
                   ,
-                    )
+                )
 
-                  ],
+              ],
             ),
             const SizedBox(
               height: 30,
@@ -574,7 +545,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 const SizedBox(
                   width: 20,
                 ),
-              ispostsecttion?  Expanded(
+                ispostsecttion?  Expanded(
                   child: Wrap(
                     alignment: WrapAlignment.start,  // Align items to the start (left side)
                     runAlignment: WrapAlignment.start,  // Align rows to the top

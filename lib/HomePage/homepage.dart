@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:vistafeedd/Profile%20Page/otherprofilepage.dart';
 import 'package:vistafeedd/Profile%20Page/profilepage.dart';
 
 class HomePage extends StatefulWidget {
@@ -310,12 +311,17 @@ class _HomePageState extends State<HomePage> {
                             color: Colors.white,
                             borderRadius: BorderRadius.all(Radius.circular(50)),
                           ),
-                          child: ClipOval(
-                            child: Image.network(
-                              postuserpfps[index],
-                              height: 35,
-                              width: 35,
-                              fit: BoxFit.cover,
+                          child: InkWell(
+                            onTap: (){
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => OtherProfilePage(userid: postuid[index]),));
+                            },
+                            child: ClipOval(
+                              child: Image.network(
+                                postuserpfps[index],
+                                height: 35,
+                                width: 35,
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
                         ),
@@ -324,7 +330,7 @@ class _HomePageState extends State<HomePage> {
                             children: [
                               InkWell(
                                 onTap: (){
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePage(userid: postuid[index]),));
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => OtherProfilePage(userid: postuid[index]),));
                                 },
                                 child: Text(
                                   '   ${postusername[index]}  ',

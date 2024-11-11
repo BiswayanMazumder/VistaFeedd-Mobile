@@ -161,7 +161,7 @@ class _PostDetailsState extends State<PostDetails> {
 
       if (docsnap.exists) {
         final likes = docsnap.data()?['likes'] ?? [];
-        isliked.add(likes.contains(widget.UID));
+        isliked.add(likes.contains(_auth.currentUser!.uid));
       } else {
         isliked.add(false); // If doc doesn't exist, assume not liked
       }
@@ -269,7 +269,7 @@ bool isLoading=true;
                     if(isliked[index]){
                       await _firestore.collection('Post Likes').doc(PIDS[index]).set(
                           {
-                            'likes':FieldValue.arrayRemove([widget.UID])
+                            'likes':FieldValue.arrayRemove([_auth.currentUser!.uid])
                           },SetOptions(merge: true));
                     }
                     setState(() {
@@ -280,7 +280,7 @@ bool isLoading=true;
                     if(isliked[index]){
                       await _firestore.collection('Post Likes').doc(PIDS[index]).set(
                           {
-                            'likes':FieldValue.arrayRemove([widget.UID])
+                            'likes':FieldValue.arrayRemove([_auth.currentUser!.uid])
                           },SetOptions(merge: true));
                     }
                     setState(() {
