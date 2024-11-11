@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:vistafeedd/HomePage/homepage.dart';
 import 'package:video_player/video_player.dart';
 import 'package:vistafeedd/Post%20Details%20Page/postdetails.dart';
+import 'package:vistafeedd/Reels%20Section%20Page/reelviewingpage.dart';
 class OtherProfilePage extends StatefulWidget {
   final String userid;
   OtherProfilePage({required this.userid});
@@ -176,20 +177,24 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
         title: Row(
           // mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            isprivate
-                ? SizedBox(
-              height: 18,
-              width: 18,
-              child: SvgPicture.string(
-                  '<svg xmlns="http://www.w3.org/2000/svg" fill="#FFFFFF" viewBox="0 0 50 50" width="20px" height="20px"><path d="M 25 3 C 18.363281 3 13 8.363281 13 15 L 13 20 L 9 20 C 7.355469 20 6 21.355469 6 23 L 6 47 C 6 48.644531 7.355469 50 9 50 L 41 50 C 42.644531 50 44 48.644531 44 47 L 44 23 C 44 21.355469 42.644531 20 41 20 L 37 20 L 37 15 C 37 8.363281 31.636719 3 25 3 Z M 25 5 C 30.566406 5 35 9.433594 35 15 L 35 20 L 15 20 L 15 15 C 15 9.433594 19.433594 5 25 5 Z M 9 22 L 41 22 C 41.554688 22 42 22.445313 42 23 L 42 47 C 42 47.554688 41.554688 48 41 48 L 9 48 C 8.445313 48 8 47.554688 8 47 L 8 23 C 8 22.445313 8.445313 22 9 22 Z M 25 30 C 23.300781 30 22 31.300781 22 33 C 22 33.898438 22.398438 34.6875 23 35.1875 L 23 38 C 23 39.101563 23.898438 40 25 40 C 26.101563 40 27 39.101563 27 38 L 27 35.1875 C 27.601563 34.6875 28 33.898438 28 33 C 28 31.300781 26.699219 30 25 30 Z"/></svg>'),
-            )
-                : Container(),
-            const SizedBox(
-              width: 10,
-            ),
-            Text(
-              usernames,
-              style: GoogleFonts.poppins(color: Colors.white, fontSize: 15),
+            Row(
+              children: [
+                Text(
+                  usernames,
+                  style: GoogleFonts.poppins(color: Colors.white, fontSize: 15),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                isverified
+                    ? const SizedBox(
+                    width: 15,
+                    height: 15,
+                    child: Image(
+                        image: NetworkImage(
+                            'https://firebasestorage.googleapis.com/v0/b/vistafeedd.appspot.com/o/Assets%2Ficons8-verified-badge-48.png?alt=media&token=db0c0b9f-2f66-4401-a60b-11268ef68b2b')))
+                    : Container()
+              ],
             )
           ],
         ),
@@ -383,16 +388,37 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
                 // const SizedBox(
                 //   width: 30,
                 // ),
-                Container(
-                  height: 35,
-                  width: MediaQuery.sizeOf(context).width / 2.5,
-                  decoration:  BoxDecoration(
-                      color:!followers.contains(_auth.currentUser!.uid)?Color.fromRGBO(0, 149, 246, 7): Color.fromRGBO(54, 54, 54, 7),
-                      borderRadius: BorderRadius.all(Radius.circular(10))),
-                  child: Center(
-                    child: Text(
-                      !followers.contains(_auth.currentUser!.uid)?'Follow':'Following',
-                      style: GoogleFonts.poppins(color: Colors.white),
+                InkWell(
+                  onTap: ()async{
+                    if(followers.contains(_auth.currentUser!.uid)){
+                      await _firestore.collection('Followers').doc(widget.userid).set(
+                          {
+                            'Followers ID':FieldValue.arrayRemove([_auth.currentUser!.uid])
+                          },SetOptions(merge: true));
+                      setState(() {
+                        followers.remove(_auth.currentUser!.uid);
+                      });
+                    }else{
+                      await _firestore.collection('Followers').doc(widget.userid).set(
+                          {
+                            'Followers ID':FieldValue.arrayUnion([_auth.currentUser!.uid])
+                          },SetOptions(merge: true));
+                      setState(() {
+                        followers.add(_auth.currentUser!.uid);
+                      });
+                    }
+                  },
+                  child: Container(
+                    height: 35,
+                    width: MediaQuery.sizeOf(context).width / 2.5,
+                    decoration:  BoxDecoration(
+                        color:!followers.contains(_auth.currentUser!.uid)?Color.fromRGBO(0, 149, 246, 7): Color.fromRGBO(54, 54, 54, 7),
+                        borderRadius: BorderRadius.all(Radius.circular(10))),
+                    child: Center(
+                      child: Text(
+                        !followers.contains(_auth.currentUser!.uid)?'Follow':'Following',
+                        style: GoogleFonts.poppins(color: Colors.white),
+                      ),
                     ),
                   ),
                 ),
@@ -580,11 +606,16 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
                     children: List.generate(RIDS.length, (i) {
                       return Container(
                         width: MediaQuery.of(context).size.width / 3 - 20,  // Adjust to fit 3 items per row
-                        child: Image(
-                          image: NetworkImage(ReelThumbnail[i]),
-                          height: 150,
-                          width: MediaQuery.of(context).size.width / 3 - 20,  // Same as width to maintain aspect ratio
-                          fit: BoxFit.cover,
+                        child: InkWell(
+                          onTap: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => ReelViewing(ReelVideoID: ReelVideos[i],thumbnail: ReelThumbnail[i],),));
+                          },
+                          child: Image(
+                            image: NetworkImage(ReelThumbnail[i]),
+                            height: 150,
+                            width: MediaQuery.of(context).size.width / 3 - 20,  // Same as width to maintain aspect ratio
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       );
                     }),

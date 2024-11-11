@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:vistafeedd/HomePage/homepage.dart';
 import 'package:video_player/video_player.dart';
 import 'package:vistafeedd/Post%20Details%20Page/postdetails.dart';
+import 'package:vistafeedd/Reels%20Section%20Page/reelviewingpage.dart';
 class ProfilePage extends StatefulWidget {
   final String userid;
   ProfilePage({required this.userid});
@@ -609,11 +610,16 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: List.generate(RIDS.length, (i) {
                       return Container(
                         width: MediaQuery.of(context).size.width / 3 - 20,  // Adjust to fit 3 items per row
-                        child: Image(
-                          image: NetworkImage(ReelThumbnail[i]),
-                          height: 150,
-                          width: MediaQuery.of(context).size.width / 3 - 20,  // Same as width to maintain aspect ratio
-                          fit: BoxFit.cover,
+                        child: InkWell(
+                          onTap: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => ReelViewing(ReelVideoID: ReelVideos[i],thumbnail: ReelThumbnail[i],),));
+                          },
+                          child: Image(
+                            image: NetworkImage(ReelThumbnail[i]),
+                            height: 150,
+                            width: MediaQuery.of(context).size.width / 3 - 20,  // Same as width to maintain aspect ratio
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       );
                     }),
