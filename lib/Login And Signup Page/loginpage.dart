@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:video_player/video_player.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:vistafeedd/HomePage/homepage.dart';
 import 'package:vistafeedd/Login%20And%20Signup%20Page/signup.dart';
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -80,6 +81,7 @@ class _LoginPageState extends State<LoginPage> {
        setState(() {
          isloading=false;
        });
+       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage(),));
        if (kDebugMode) {
          print('Logged In');
        }

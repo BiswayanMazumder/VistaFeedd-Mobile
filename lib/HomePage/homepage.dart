@@ -345,11 +345,13 @@ class _HomePageState extends State<HomePage> {
                     const SizedBox(height: 30),
                     Center(
                       child: Container(
+                        width: 0.99 * MediaQuery.sizeOf(context).width,
                         decoration: const BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(20)),
                         ),
                         child: Image(
                           image: NetworkImage(postimages[index]),
+                          // height: 380,
                           width: 0.99 * MediaQuery.sizeOf(context).width,
                         ),
                       ),
@@ -442,7 +444,11 @@ class _HomePageState extends State<HomePage> {
                         const SizedBox(
                           width: 10,
                         ),
-                        Text(postcaption[index],style: GoogleFonts.poppins(color: Colors.white),),
+                        Column(
+                          children: [
+                            Text(postcaption[index],style: GoogleFonts.poppins(color: Colors.white,fontSize: 12),overflow:TextOverflow.ellipsis,),
+                          ],
+                        ),
                       ],
                     ),
 
