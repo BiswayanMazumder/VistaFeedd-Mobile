@@ -20,8 +20,6 @@ class _PostDetailsState extends State<PostDetails> {
   late VideoPlayerController _controller1;
   String usernames = '';
   String bio = '';
-  bool isprivate = false;
-  bool isverified = false;
   Future<void> fetchpfp() async {
     final docsnap = await _firestore
         .collection('User Details')
@@ -32,12 +30,7 @@ class _PostDetailsState extends State<PostDetails> {
         pfp = docsnap.data()?['Profile Pic'];
         usernames = docsnap.data()?['Name'];
         bio = docsnap.data()?['Bio'];
-        isprivate = docsnap.data()?['Private Account'];
-        isverified = docsnap.data()?['Verified'];
       });
-    }
-    if (kDebugMode) {
-      print('Verified $isverified');
     }
   }
 
@@ -95,7 +88,7 @@ class _PostDetailsState extends State<PostDetails> {
       final postSnap =
       await _firestore.collection('Global Post').doc(postId).get();
       if (postSnap.exists) {
-        if (postSnap.data()?['Uploaded UID'] == _auth.currentUser?.uid) {
+        if (postSnap.data()?['Uploaded UID'] == widget.UID) {
           matchingPostIds.add(postSnap.data()?['postid']);
           matchingPostImages.add(postSnap.data()?['Image Link']);
         }
@@ -134,7 +127,7 @@ class _PostDetailsState extends State<PostDetails> {
       final postSnap =
       await _firestore.collection('Global Reels').doc(postId).get();
       if (postSnap.exists) {
-        if (postSnap.data()?['Uploaded UID'] == _auth.currentUser?.uid) {
+        if (postSnap.data()?['Uploaded UID'] == widget.UID) {
           matchingPostIds.add(postSnap.data()?['reelid']);
           matchingPostImages.add(postSnap.data()?['Video ID']);
           matchingreelImages.add(postSnap.data()?['Thumbnail']);
@@ -168,7 +161,7 @@ class _PostDetailsState extends State<PostDetails> {
 
       if (docsnap.exists) {
         final likes = docsnap.data()?['likes'] ?? [];
-        isliked.add(likes.contains(_auth.currentUser!.uid));
+        isliked.add(likes.contains(widget.UID));
       } else {
         isliked.add(false); // If doc doesn't exist, assume not liked
       }

@@ -265,7 +265,7 @@ class _HomePageState extends State<HomePage> {
             ),
             InkWell(
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePage(),));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePage(userid: _auth.currentUser!.uid),));
               },
               child: Container(
                 height: 30,
@@ -322,11 +322,16 @@ class _HomePageState extends State<HomePage> {
                         SizedBox(
                           child: Row(
                             children: [
-                              Text(
-                                '   ${postusername[index]}  ',
-                                style: GoogleFonts.poppins(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
+                              InkWell(
+                                onTap: (){
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePage(userid: postuid[index]),));
+                                },
+                                child: Text(
+                                  '   ${postusername[index]}  ',
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
                               verification[index]

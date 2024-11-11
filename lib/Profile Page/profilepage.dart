@@ -8,7 +8,8 @@ import 'package:vistafeedd/HomePage/homepage.dart';
 import 'package:video_player/video_player.dart';
 import 'package:vistafeedd/Post%20Details%20Page/postdetails.dart';
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+  final String userid;
+  ProfilePage({required this.userid});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -26,7 +27,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> fetchpfp() async {
     final docsnap = await _firestore
         .collection('User Details')
-        .doc(_auth.currentUser!.uid)
+        .doc(widget.userid)
         .get();
     if (docsnap.exists) {
       setState(() {
@@ -47,7 +48,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> fetchfollowing() async {
     final docsnap = await _firestore
         .collection('Following')
-        .doc(_auth.currentUser!.uid)
+        .doc(widget.userid)
         .get();
     if (docsnap.exists) {
       setState(() {
@@ -62,7 +63,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> fetchfollower() async {
     final docsnap = await _firestore
         .collection('Followers')
-        .doc(_auth.currentUser!.uid)
+        .doc(widget.userid)
         .get();
     if (docsnap.exists) {
       setState(() {
@@ -96,7 +97,7 @@ class _ProfilePageState extends State<ProfilePage> {
       final postSnap =
           await _firestore.collection('Global Post').doc(postId).get();
       if (postSnap.exists) {
-        if (postSnap.data()?['Uploaded UID'] == _auth.currentUser?.uid) {
+        if (postSnap.data()?['Uploaded UID'] == widget.userid) {
           matchingPostIds.add(postSnap.data()?['postid']);
           matchingPostImages.add(postSnap.data()?['Image Link']);
         }
@@ -589,7 +590,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         child: InkWell(
                           onTap: (){
                             Navigator.push(context, MaterialPageRoute(builder: (context) => PostDetails(
-                              UID: _auth.currentUser!.uid,
+                              UID: widget.userid,
                             ),));
                           },
                           child: Image(
