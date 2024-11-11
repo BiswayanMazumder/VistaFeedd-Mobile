@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vistafeedd/HomePage/homepage.dart';
 import 'package:video_player/video_player.dart';
+import 'package:vistafeedd/Post%20Details%20Page/postdetails.dart';
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
@@ -585,11 +586,18 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: List.generate(PIDS.length, (i) {
                       return Container(
                         width: MediaQuery.of(context).size.width / 3 - 20,  // Adjust to fit 3 items per row
-                        child: Image(
-                          image: NetworkImage(PostImages[i]),
-                          height: 150,
-                          width: MediaQuery.of(context).size.width / 3 - 20,  // Same as width to maintain aspect ratio
-                          fit: BoxFit.cover,
+                        child: InkWell(
+                          onTap: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => PostDetails(
+                              UID: _auth.currentUser!.uid,
+                            ),));
+                          },
+                          child: Image(
+                            image: NetworkImage(PostImages[i]),
+                            height: 150,
+                            width: MediaQuery.of(context).size.width / 3 - 20,  // Same as width to maintain aspect ratio
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       );
                     }),
