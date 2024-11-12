@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -26,13 +27,18 @@ class StoryPage extends StatefulWidget {
 class _StoryPageState extends State<StoryPage> with SingleTickerProviderStateMixin {
   Color _backgroundColor = Colors.black; // Default background color
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore=FirebaseFirestore.instance;
   late AnimationController _controller;
-
+  Future<void> writestoryviewers()async{
+    await _firestore.collection('Stories').doc(widget.UID).update({
+      'Viewers':FieldValue.arrayUnion([_auth.currentUser!.uid])
+    });
+  }
   @override
   void initState() {
     super.initState();
     _getDominantColor();
-
+    writestoryviewers();
     // Initialize the animation controller to run for 7 seconds
     _controller = AnimationController(
       duration: const Duration(seconds: 7),
