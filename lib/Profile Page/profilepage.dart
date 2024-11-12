@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:vistafeedd/HomePage/homepage.dart';
 import 'package:video_player/video_player.dart';
 import 'package:vistafeedd/Post%20Details%20Page/postdetails.dart';
+import 'package:vistafeedd/Profile%20Page%20Details/followerspage.dart';
 import 'package:vistafeedd/Reels%20Section%20Page/reelviewingpage.dart';
 class ProfilePage extends StatefulWidget {
   final String userid;
@@ -329,20 +330,27 @@ class _ProfilePageState extends State<ProfilePage> {
                     )
                   ],
                 ),
-                Column(
-                  children: [
-                    Text(
-                      '${followers.length}',
-                      style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 18),
-                    ),
-                    Text(
-                      'followers',
-                      style: GoogleFonts.poppins(color: Colors.white),
-                    )
-                  ],
+                InkWell(
+                  onTap: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => FollowerPage(
+                        followerslist: followers,
+                        username: usernames),));
+                  },
+                  child: Column(
+                    children: [
+                      Text(
+                        '${followers.length}',
+                        style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 18),
+                      ),
+                      Text(
+                        'followers',
+                        style: GoogleFonts.poppins(color: Colors.white),
+                      )
+                    ],
+                  ),
                 ),
                 Column(
                   children: [

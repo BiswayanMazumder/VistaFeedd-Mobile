@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:vistafeedd/Profile%20Page/otherprofilepage.dart';
 import 'package:vistafeedd/Profile%20Page/profilepage.dart';
+import 'package:zoom_pinch_overlay/zoom_pinch_overlay.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -360,10 +361,16 @@ class _HomePageState extends State<HomePage> {
                         decoration: const BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(20)),
                         ),
-                        child: Image(
-                          image: NetworkImage(postimages[index]),
-                          // height: 380,
-                          width: 0.99 * MediaQuery.sizeOf(context).width,
+                        child: ZoomOverlay(
+                          modalBarrierColor: Colors.black12, // Optional
+                          minScale: 0.5, // Optional
+                          maxScale: 3.0, // Optional
+                          animationCurve: Curves.fastOutSlowIn, // Defaults to fastOutSlowIn which mimics IOS instagram behavior
+                          animationDuration: const Duration(milliseconds: 300), // Defaults to 100 Milliseconds. Recommended duration is 300 milliseconds for Curves.fastOutSlowIn
+                          twoTouchOnly: true, // Defaults to false
+                          onScaleStart: () {}, // optional VoidCallback
+                          onScaleStop: () {}, // optional VoidCallback
+                          child:Image(image: NetworkImage(postimages[index]))
                         ),
                       ),
                     ),
