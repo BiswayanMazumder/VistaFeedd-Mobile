@@ -53,7 +53,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 const SizedBox(
                   height: 10,
                 ),
-                Text('by Biswayan Mazumder',style: GoogleFonts.poppins(color: Colors.white,
+                Text('A Biswayan Mazumder venture',style: GoogleFonts.poppins(color: Colors.white,
                     fontSize: 12,
                   fontWeight: FontWeight.w300
                 ),),

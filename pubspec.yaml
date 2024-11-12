@@ -42,6 +42,8 @@ dependencies:
   google_fonts: ^4.0.4
   video_player: ^2.8.5
   zoom_pinch_overlay: ^1.4.3
+  connectivity_plus: ^6.0.3
+  palette_generator: ^0.3.3+4
 dev_dependencies:
   flutter_test:
     sdk: flutter
