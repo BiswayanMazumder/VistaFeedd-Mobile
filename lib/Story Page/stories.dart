@@ -9,12 +9,14 @@ class StoryPage extends StatefulWidget {
   final String username;
   final String storylink;
   final DateTime? UploadDate;
+  final String UID;
 
   StoryPage({
     required this.PFP,
     required this.username,
     required this.storylink,
     required this.UploadDate,
+    required this.UID
   });
 
   @override
@@ -122,7 +124,7 @@ class _StoryPageState extends State<StoryPage> with SingleTickerProviderStateMix
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ProfilePage(userid: _auth.currentUser!.uid),
+                        builder: (context) => ProfilePage(userid: widget.UID),
                       ),
                     );
                   },
@@ -138,7 +140,7 @@ class _StoryPageState extends State<StoryPage> with SingleTickerProviderStateMix
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ProfilePage(userid: _auth.currentUser!.uid),
+                        builder: (context) => ProfilePage(userid: widget.UID),
                       ),
                     );
                   },

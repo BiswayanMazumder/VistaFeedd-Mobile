@@ -19,59 +19,48 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  bool _isLoading = true;
+  List<dynamic> following = [];
   List<dynamic> postimages = [];
-  List<dynamic> postusername = [];
   List<dynamic> postuid = [];
-  List<dynamic> likedusers = [];
+  List<dynamic> postusername = [];
   List<dynamic> postcaption = [];
   List<dynamic> postdate = [];
   List<dynamic> postuserpfps = [];
-  final String svgString = '''
-<svg aria-label="Verified" class="x1lliihq x1n2onr6" fill="rgb(0, 149, 246)" height="12" role="img" viewBox="0 0 12 12" width="12"><title>Verified</title><path d="M19.998 3.094 14.638 0l-2.972 5.15H5.432v6.354L0 14.64 3.094 20 0 25.359l5.432 3.137v5.905h5.975L14.638 40l5.36-3.094L25.358 40l3.232-5.6h6.162v-6.01L40 25.359 36.905 20 40 14.641l-5.248-3.03v-6.46h-6.419L25.358 0l-5.36 3.094Zm7.415 11.225 2.254 2.287-11.43 11.5-6.835-6.93 2.244-2.258 4.587 4.581 9.18-9.18Z" fill-rule="evenodd"></path></svg>
-''';
-
-  bool _isLoading = true;
-  List<dynamic> following = [];
+  List<dynamic> likedusers = [];
   List<dynamic> verification = [];
-  // Fetch the list of following users
-  Future<void> fetchfollowing() async {
-    final docsnap = await _firestore
-        .collection('Following')
-        .doc(_auth.currentUser!.uid)
-        .get();
-    if (docsnap.exists) {
-      setState(() {
-        following = docsnap.data()?['Following ID'] ?? [];
-      });
-      setState(() {
-        _isLoading = false;
-      });
-    }
+  List<dynamic> PID = [];
+  List<dynamic> isliked = [];
+  List<dynamic> savedposts = [];
+  List<dynamic> storiesurl = [];
+  List<dynamic> storiesuploaderuid = [];
+  List<dynamic> storiesuploaddate = [];
+  List<dynamic> storiesuploadname = [];
+  List<dynamic> storiesuploadpfp = [];
+  String pfp = '';
+  String usernames = '';
+  String PFP = '';
+  String username = '';
+  String storyURL = '';
+  DateTime? uploaddate;
 
-    if (kDebugMode) {
-      print('Following: $following');
+// Fetch the list of following users
+  Future<void> fetchfollowing() async {
+    final docsnap = await _firestore.collection('Following').doc(_auth.currentUser!.uid).get();
+    if (docsnap.exists) {
+      following = docsnap.data()?['Following ID'] ?? [];
     }
   }
 
-  List<dynamic> PID = [];
-  // Fetch the posts from the followed users only
+// Fetch the posts from the followed users only
   Future<void> fetchposts() async {
     await fetchfollowing();
     List postID = [];
 
     try {
-      final docsnap =
-          await _firestore.collection('Global Post IDs').doc('Posts').get();
+      final docsnap = await _firestore.collection('Global Post IDs').doc('Posts').get();
       if (docsnap.exists) {
-        setState(() {
-          postID = docsnap.data()?['Post IDs'] ?? [];
-        });
-      }
-      setState(() {
-        _isLoading = false;
-      });
-      if (kDebugMode) {
-        print('PIDs: $postID');
+        postID = docsnap.data()?['Post IDs'] ?? [];
       }
 
       List<dynamic> tempPostImages = [];
@@ -79,187 +68,122 @@ class _HomePageState extends State<HomePage> {
       List<dynamic> tempPostCaption = [];
       List<dynamic> tempPostDate = [];
       List<dynamic> temppostid = [];
-      // Only fetch posts from followed users
+
       for (int i = 0; i < postID.length; i++) {
-        final postdata =
-            await _firestore.collection('Global Post').doc(postID[i]).get();
+        final postdata = await _firestore.collection('Global Post').doc(postID[i]).get();
         if (postdata.exists) {
           final postUid = postdata.data()?['Uploaded UID'];
           if (following.contains(postUid)) {
-            // Filter posts by followed users
             final imageLink = postdata.data()?['Image Link'];
             if (imageLink is List) {
               tempPostImages.addAll(imageLink);
             } else if (imageLink is String) {
               tempPostImages.add(imageLink);
             }
-
             tempPostUid.add(postUid ?? '');
             temppostid.add(postdata.data()?['postid'] ?? '');
             tempPostCaption.add(postdata.data()?['Caption'] ?? '');
             tempPostDate.add(postdata.data()?['Upload Date'] ?? '');
           }
-          setState(() {
-            _isLoading = false;
-          });
         }
       }
 
-      setState(() {
-        postimages = tempPostImages;
-        postuid = tempPostUid;
-        postcaption = tempPostCaption;
-        postdate = tempPostDate;
-        PID = temppostid;
-      });
-      if (kDebugMode) {
-        print('Posts fetched: ${postimages.length}');
-      }
+      postimages = tempPostImages;
+      postuid = tempPostUid;
+      postcaption = tempPostCaption;
+      postdate = tempPostDate;
+      PID = temppostid;
+
     } catch (e) {
-      if (kDebugMode) {
-        print('Posts error: $e');
-      }
+      print('Posts error: $e');
     }
   }
 
-  // Fetch user details for the posts (e.g., username, profile picture)
+// Fetch user details for the posts (e.g., username, profile picture)
   Future<void> fetchpostuserdetails() async {
     try {
       await fetchposts();
       for (int i = 0; i < postuid.length; i++) {
-        final docsnap =
-            await _firestore.collection('User Details').doc(postuid[i]).get();
+        final docsnap = await _firestore.collection('User Details').doc(postuid[i]).get();
         if (docsnap.exists) {
           postusername.add(docsnap.data()?['Name']);
           postuserpfps.add(docsnap.data()?['Profile Pic']);
           verification.add(docsnap.data()?['Verified']);
-          setState(() {
-            _isLoading = false;
-          });
         }
       }
-      if (kDebugMode) {
-        print('Verified $verification');
-      }
     } catch (e) {
-      if (kDebugMode) {
-        print("User details error: $e");
-      }
-    }
-
-    if (kDebugMode) {
-      print('Posts User Details: $postuserpfps $postusername');
+      print("User details error: $e");
     }
   }
 
-  String pfp = '';
-  String usernames = '';
   Future<void> fetchpfp() async {
-    final docsnap = await _firestore
-        .collection('User Details')
-        .doc(_auth.currentUser!.uid)
-        .get();
+    final docsnap = await _firestore.collection('User Details').doc(_auth.currentUser!.uid).get();
     if (docsnap.exists) {
-      setState(() {
-        pfp = docsnap.data()?['Profile Pic'];
-        usernames = docsnap.data()?['Name'];
-      });
-      setState(() {
-        _isLoading = false;
-      });
+      pfp = docsnap.data()?['Profile Pic'];
+      usernames = docsnap.data()?['Name'];
     }
   }
-
-  List<dynamic> isliked = [];
 
   Future<void> fetchlikes() async {
-    await fetchposts(); // Ensure posts are fetched and postuid is populated
-
+    await fetchposts();
     if (PID.isEmpty) {
-      if (kDebugMode) {
-        print("postuid is empty. No posts to fetch likes for.");
-      }
+      print("postuid is empty. No posts to fetch likes for.");
       return;
     }
 
     for (int i = 0; i < PID.length; i++) {
-      final docsnap =
-          await _firestore.collection('Post Likes').doc(PID[i]).get();
-
+      final docsnap = await _firestore.collection('Post Likes').doc(PID[i]).get();
       if (docsnap.exists) {
         final likes = docsnap.data()?['likes'] ?? [];
         isliked.add(likes.contains(_auth.currentUser!.uid));
-        setState(() {
-          _isLoading = false;
-        });
       } else {
-        isliked.add(false); // If doc doesn't exist, assume not liked
+        isliked.add(false);
       }
     }
-
-    if (kDebugMode) {
-      print('Liked: $isliked');
-    } // Should now print true/false values
   }
-
-  List<dynamic> savedposts = [];
 
   Future<void> fetchsavedposts() async {
-    // await fetchposts();  // Ensure posts are fetched and postuid is populated
-    final docsnap = await _firestore
-        .collection('Saved Posts')
-        .doc(_auth.currentUser!.uid)
-        .get();
+    final docsnap = await _firestore.collection('Saved Posts').doc(_auth.currentUser!.uid).get();
     if (docsnap.exists) {
-      setState(() {
-        savedposts = (docsnap.data()?['POST IDs']);
-      });
-      setState(() {
-        _isLoading = false;
-      });
-    }
-    if (kDebugMode) {
-      print('Saved $savedposts');
+      savedposts = (docsnap.data()?['POST IDs']);
     }
   }
-  String PFP='';
-  String username='';
+
   Future<void> fetchpfps() async {
-    final docsnap = await _firestore
-        .collection('User Details')
-        .doc(_auth.currentUser!.uid)
-        .get();
+    final docsnap = await _firestore.collection('User Details').doc(_auth.currentUser!.uid).get();
     if (docsnap.exists) {
-      setState(() {
-        PFP = docsnap.data()?['Profile Pic'];
-        username = docsnap.data()?['Name'];
-      });
+      PFP = docsnap.data()?['Profile Pic'];
+      username = docsnap.data()?['Name'];
     }
   }
-  String storyURL = '';
-  DateTime? uploaddate;
 
   Future<void> fetchstories() async {
     final docsnap = await _firestore.collection('Stories').doc(_auth.currentUser!.uid).get();
-
     if (docsnap.exists) {
-      setState(() {
-        storyURL = docsnap.data()?['Story Link'] ?? '';  // Use empty string if null
-        // If the Upload Date is a Timestamp, convert it to DateTime
-        Timestamp? timestamp = docsnap.data()?['Upload Date'];
-        if (timestamp != null) {
-          uploaddate = timestamp.toDate();
-        } else {
-          uploaddate = null; // Handle if there is no Upload Date field
-        }
-      });
-    }
-
-    if (kDebugMode) {
-      print('Story URL: $storyURL');
-      print('Upload Date: $uploaddate');
+      storyURL = docsnap.data()?['Story Link'] ?? '';
+      Timestamp? timestamp = docsnap.data()?['Upload Date'];
+      uploaddate = timestamp?.toDate();
     }
   }
+
+  Future<void> fetchotherstories() async {
+    await fetchfollowing();
+    for (int i = 0; i < following.length; i++) {
+      final docsnap = await _firestore.collection('Stories').doc(following[i]).get();
+      if (docsnap.exists) {
+        storiesurl.add(docsnap.data()?['Story Link']);
+        storiesuploaderuid.add(docsnap.data()?['Uploader UID']);
+      }
+    }
+    for (int i = 0; i < storiesuploaderuid.length; i++) {
+      final Docsnap = await _firestore.collection('User Details').doc(storiesuploaderuid[i]).get();
+      if (Docsnap.exists) {
+        storiesuploadname.add(Docsnap.data()?['Name']);
+        storiesuploadpfp.add(Docsnap.data()?['Profile Pic']);
+      }
+    }
+  }
+
   Future<void> fetchdata() async {
     await fetchpostuserdetails();
     await fetchfollowing();
@@ -268,10 +192,12 @@ class _HomePageState extends State<HomePage> {
     await fetchsavedposts();
     await fetchpfps();
     await fetchstories();
+    await fetchotherstories();
     setState(() {
       _isLoading = false;
     });
   }
+
 
   @override
   void initState() {
@@ -402,58 +328,109 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(
                     height: 20,
                   ),
-                   Row(
-                    children: [
-                    const SizedBox(
-                      width: 20,
-                    ),
-                      Column(
-                        children: [
-                          Stack(
-                            children: [
-                              CircleAvatar(
-                                radius:storyURL!=null? 37:35,
-                                backgroundColor:storyURL!=null? Colors.green:Colors.black,
-                                child: InkWell(
-                                  onTap: (){
-                                    if(storyURL!=null){
-                                      Navigator.push(context, MaterialPageRoute(builder: (context) =>StoryPage(
-                                        PFP: PFP,
-                                        UploadDate: uploaddate,
-                                        storylink: storyURL,
-                                        username: username,
-                                      )));
-                                    }
-                                  },
-                                  child: CircleAvatar(
-                                    radius: 35,
-                                    backgroundColor: Colors.white,
-                                    backgroundImage: NetworkImage(PFP),
+                   SingleChildScrollView(
+                     scrollDirection: Axis.horizontal,
+                     child: Row(
+                      children: [
+
+                        Column(
+                          children: [
+                            Stack(
+                              children: [
+                                CircleAvatar(
+                                  radius:storyURL!=null? 37:35,
+                                  backgroundColor:storyURL!=null? Colors.green:Colors.black,
+                                  child: InkWell(
+                                    onTap: (){
+                                      if(storyURL!=null){
+                                        Navigator.push(context, MaterialPageRoute(builder: (context) =>StoryPage(
+                                          PFP: PFP,
+                                          UploadDate: uploaddate,
+                                          storylink: storyURL,
+                                          username: username,
+                                          UID: _auth.currentUser!.uid,
+                                        )));
+                                      }
+                                    },
+                                    child: CircleAvatar(
+                                      radius: 35,
+                                      backgroundColor: Colors.white,
+                                      backgroundImage: NetworkImage(PFP),
+                                    ),
                                   ),
                                 ),
+                               storyURL!=null?  Positioned(
+                                    right: 2,
+                                    top: 50,
+                                    child:CircleAvatar(
+                                      backgroundColor: Colors.blue,radius: 10,
+                                      child: InkWell(
+                                        onTap: (){},
+                                        child:const Icon(Icons.add,color: Colors.white,size: 15,) ,
+                                      ),) ):Container()
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Text('Your story',style: GoogleFonts.poppins(
+                              color: Colors.white,
+                              fontSize: 12
+                            ),)
+                          ],
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        for(int i=0;i<storiesuploaderuid.length;i++)
+                          Row(
+                            children: [
+                              Column(
+                                children: [
+                                  Stack(
+                                    children: [
+                                      CircleAvatar(
+                                        radius: 37,
+                                        backgroundColor:Colors.green,
+                                        child: InkWell(
+                                          onTap: (){
+
+                                            Navigator.push(context, MaterialPageRoute(builder: (context) =>StoryPage(
+                                              PFP: storiesuploadpfp[i],
+                                              UploadDate: uploaddate,
+                                              storylink: storiesurl[i],
+                                              username: storiesuploadname[i],
+                                              UID: storiesuploaderuid[i],
+                                            )));
+
+                                          },
+                                          child: CircleAvatar(
+                                            radius: 35,
+                                            backgroundColor: Colors.white,
+                                            backgroundImage: NetworkImage(storiesuploadpfp[i]),
+                                          ),
+                                        ),
+                                      ),
+
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Text(storiesuploadname[i],style: GoogleFonts.poppins(
+                                      color: Colors.white,
+                                      fontSize: 12
+                                  ),)
+                                ],
                               ),
-                               Positioned(
-                                  right: 2,
-                                  top: 50,
-                                  child:CircleAvatar(
-                                    backgroundColor: Colors.blue,radius: 10,
-                                    child: InkWell(
-                                      onTap: (){},
-                                      child:const Icon(Icons.add,color: Colors.white,size: 15,) ,
-                                    ),) )
+                              const SizedBox(
+                                width: 10,
+                              ),
                             ],
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Text('Your story',style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontSize: 12
-                          ),)
-                        ],
-                      )
-                    ],
-                  ),
+                          )
+                      ],
+                                       ),
+                   ),
                   const SizedBox(
                     height: 10,
                   ),
