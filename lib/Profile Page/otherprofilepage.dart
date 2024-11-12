@@ -395,6 +395,10 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
                           {
                             'Followers ID':FieldValue.arrayRemove([_auth.currentUser!.uid])
                           },SetOptions(merge: true));
+                      await _firestore.collection('Following').doc(_auth.currentUser!.uid).set(
+                          {
+                            'Following ID':FieldValue.arrayRemove([widget.userid])
+                          },SetOptions(merge: true));
                       setState(() {
                         followers.remove(_auth.currentUser!.uid);
                       });
@@ -402,6 +406,10 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
                       await _firestore.collection('Followers').doc(widget.userid).set(
                           {
                             'Followers ID':FieldValue.arrayUnion([_auth.currentUser!.uid])
+                          },SetOptions(merge: true));
+                      await _firestore.collection('Following').doc(_auth.currentUser!.uid).set(
+                          {
+                            'Following ID':FieldValue.arrayUnion([widget.userid])
                           },SetOptions(merge: true));
                       setState(() {
                         followers.add(_auth.currentUser!.uid);
@@ -608,7 +616,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
                         width: MediaQuery.of(context).size.width / 3 - 20,  // Adjust to fit 3 items per row
                         child: InkWell(
                           onTap: (){
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => ReelViewing(ReelVideoID: ReelVideos[i],thumbnail: ReelThumbnail[i],),));
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => ReelViewing(ReelVideoID: ReelVideos[i],thumbnail: ReelThumbnail[i],RID: RIDS[i],),));
                           },
                           child: Image(
                             image: NetworkImage(ReelThumbnail[i]),

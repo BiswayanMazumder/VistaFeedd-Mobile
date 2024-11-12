@@ -612,7 +612,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         width: MediaQuery.of(context).size.width / 3 - 20,  // Adjust to fit 3 items per row
                         child: InkWell(
                           onTap: (){
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => ReelViewing(ReelVideoID: ReelVideos[i],thumbnail: ReelThumbnail[i],),));
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => ReelViewing(ReelVideoID: ReelVideos[i],
+                              thumbnail: ReelThumbnail[i],
+                              RID: RIDS[i],),));
                           },
                           child: Image(
                             image: NetworkImage(ReelThumbnail[i]),
