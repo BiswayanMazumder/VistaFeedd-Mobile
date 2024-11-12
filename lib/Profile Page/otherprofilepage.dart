@@ -8,6 +8,7 @@ import 'package:vistafeedd/HomePage/homepage.dart';
 import 'package:video_player/video_player.dart';
 import 'package:vistafeedd/Post%20Details%20Page/postdetails.dart';
 import 'package:vistafeedd/Profile%20Page%20Details/followerspage.dart';
+import 'package:vistafeedd/Profile%20Page%20Details/followingpage.dart';
 import 'package:vistafeedd/Reels%20Section%20Page/reelviewingpage.dart';
 class OtherProfilePage extends StatefulWidget {
   final String userid;
@@ -307,7 +308,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
                 ),
                 InkWell(
                   onTap: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => FollowerPage(followerslist: followers, username: usernames),));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => FollowerPage(followerslist: followers, username: usernames,UID:widget.userid),));
                   },
                   child: Column(
                     children: [
@@ -325,20 +326,26 @@ class _OtherProfilePageState extends State<OtherProfilePage> {
                     ],
                   ),
                 ),
-                Column(
-                  children: [
-                    Text(
-                      '${following.length}',
-                      style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 18),
-                    ),
-                    Text(
-                      'following',
-                      style: GoogleFonts.poppins(color: Colors.white),
-                    )
-                  ],
+                InkWell(
+                  onTap: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => FollowingPage(followerslist: following, username: usernames,UID:widget.userid
+                    ),));
+                  },
+                  child: Column(
+                    children: [
+                      Text(
+                        '${following.length}',
+                        style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 18),
+                      ),
+                      Text(
+                        'following',
+                        style: GoogleFonts.poppins(color: Colors.white),
+                      )
+                    ],
+                  ),
                 )
               ],
             ),

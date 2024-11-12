@@ -4,21 +4,21 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:vistafeedd/Profile%20Page%20Details/followingpage.dart';
+import 'package:vistafeedd/Profile%20Page%20Details/followerspage.dart';
 import 'package:vistafeedd/Profile%20Page/otherprofilepage.dart';
 import 'package:vistafeedd/Profile%20Page/profilepage.dart';
-class FollowerPage extends StatefulWidget {
+class FollowingPage extends StatefulWidget {
   final List followerslist;
   final String username;
   final String UID;
-  FollowerPage(
+  FollowingPage(
       {required this.followerslist,required this.username,required this.UID});
 
   @override
-  State<FollowerPage> createState() => _FollowerPageState();
+  State<FollowingPage> createState() => _FollowingPageState();
 }
 
-class _FollowerPageState extends State<FollowerPage> {
+class _FollowingPageState extends State<FollowingPage> {
   final FirebaseAuth _auth=FirebaseAuth.instance;
   bool _isloading=true;
   final FirebaseFirestore _firestore=FirebaseFirestore.instance;
@@ -79,8 +79,8 @@ class _FollowerPageState extends State<FollowerPage> {
     // TODO: implement initState
     super.initState();
     fetchfollowersdetails();
-    fetchfollowing();
     fetchfollower();
+    fetchfollowing();
   }
   @override
   Widget build(BuildContext context) {
@@ -89,9 +89,9 @@ class _FollowerPageState extends State<FollowerPage> {
         title: Row(
           children: [
             Text(widget.username,style: GoogleFonts.poppins(
-              color: Colors.white,
-              fontSize: 15,
-              fontWeight: FontWeight.w600
+                color: Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.w600
             ),)
           ],
         ),
@@ -115,23 +115,13 @@ class _FollowerPageState extends State<FollowerPage> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               InkWell(
+                  onTap: (){
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => FollowerPage(followerslist: followers,
+                        username: widget.username,
+                        UID: widget.UID),));
+                  },
                 child: Text(
                   ' ${widget.followerslist.length} Followers',
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 15
-                  ),
-                ),
-              ),
-              InkWell(
-                onTap: (){
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => FollowingPage(followerslist: following,
-                      username: widget.username,
-                      UID: widget.UID),));
-                },
-                child: Text(
-                  ' ${following.length} Following',
                   style: GoogleFonts.poppins(
                       color: Colors.grey,
                       fontWeight: FontWeight.w500,
@@ -139,71 +129,69 @@ class _FollowerPageState extends State<FollowerPage> {
                   ),
                 ),
               ),
+              InkWell(
+                child: Text(
+                  ' ${followers.length} Following',
+                  style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 15
+                  ),
+                ),
+              ),
             ],
           ),
-          // Wrap the ListView.builder with Expanded or Flexible to provide constraints
-          Expanded(
-            child: ListView.builder(
-              itemCount: widget.followerslist.length,
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    const SizedBox(
-                      height: 40,
-                    ),
-                    Row(
-                      children: [
-                        const SizedBox(
-                          width: 20,
+          Expanded(child: ListView.builder(
+            itemCount: widget.followerslist.length,
+            itemBuilder: (context, index) {
+              return Column(
+                children: [
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    children: [
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      Container(
+                        height: 50,
+                        width: 50,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.all(Radius.circular(50)),
                         ),
-                        Container(
-                          height: 50,
-                          width: 50,
-                          decoration: const BoxDecoration(
+                        child: ClipOval(
+                          child: Image.network(
+                            pfps[index],
+                            height: 35,
+                            width: 35,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      InkWell(
+                        onTap: (){
+                          Navigator.push(context, MaterialPageRoute(builder: (context) =>widget.followerslist[index]==_auth.currentUser!.uid?
+                          ProfilePage(userid: widget.followerslist[index]):
+                          OtherProfilePage(userid: widget.followerslist[index]),));
+                        },
+                        child: Text(usernames[index],style: GoogleFonts.poppins(
                             color: Colors.white,
-                            borderRadius: BorderRadius.all(Radius.circular(50)),
-                          ),
-                          child: ClipOval(
-                            child: Image.network(
-                              pfps[index],
-                              height: 35,
-                              width: 35,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => widget.followerslist[index] == _auth.currentUser!.uid
-                                    ? ProfilePage(userid: widget.followerslist[index])
-                                    : OtherProfilePage(userid: widget.followerslist[index]),
-                              ),
-                            );
-                          },
-                          child: Text(
-                            usernames[index],
-                            style: GoogleFonts.poppins(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 30,
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
+                            fontWeight: FontWeight.w600
+                        ),),
+                      )
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                ],
+              );
+            },),)
         ],
       )
     );
