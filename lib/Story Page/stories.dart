@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:palette_generator/palette_generator.dart';
@@ -34,11 +35,25 @@ class _StoryPageState extends State<StoryPage> with SingleTickerProviderStateMix
       'Viewers':FieldValue.arrayUnion([_auth.currentUser!.uid])
     });
   }
+  List<dynamic>storyviews=[];
+  Future<void>fetchstoryviews()async{
+    final docsnap=await _firestore.collection('Stories').doc(widget.UID).get();
+    if(docsnap.exists){
+      setState(() {
+        storyviews=docsnap.data()?['Viewers'];
+      });
+    }
+    if(_auth.currentUser!.uid==widget.UID && storyviews.contains(_auth.currentUser!.uid)){
+      storyviews.remove(_auth.currentUser!.uid);
+    }
+    print('Viewers $storyviews');
+  }
   @override
   void initState() {
     super.initState();
     _getDominantColor();
     writestoryviewers();
+    fetchstoryviews();
     // Initialize the animation controller to run for 7 seconds
     _controller = AnimationController(
       duration: const Duration(seconds: 7),
@@ -165,6 +180,15 @@ class _StoryPageState extends State<StoryPage> with SingleTickerProviderStateMix
               ],
             ),
           ),
+         _auth.currentUser!.uid==widget.UID? Positioned(
+            top: MediaQuery.sizeOf(context).height-55,
+            left: 10,
+              child: Column(
+                children: [
+                  const Icon(CupertinoIcons.eye_solid,color: Colors.white,),
+                  Text('${storyviews.length} Viewers',style: GoogleFonts.poppins(color: Colors.white,fontSize: 12),)
+                ],
+              )):Container(),
         ],
       ),
     );
