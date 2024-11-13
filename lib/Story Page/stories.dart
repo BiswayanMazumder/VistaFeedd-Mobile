@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:palette_generator/palette_generator.dart';
 import 'package:vistafeedd/HomePage/homepage.dart';
+import 'package:vistafeedd/Profile%20Page/otherprofilepage.dart';
 import 'package:vistafeedd/Profile%20Page/profilepage.dart';
 
 class StoryPage extends StatefulWidget {
@@ -39,6 +40,8 @@ class _StoryPageState extends State<StoryPage> with SingleTickerProviderStateMix
   }
   List<dynamic>storyviews=[];
   List<dynamic> storylikers=[];
+  List<dynamic> storynames=[];
+  List<dynamic> storypfp=[];
   Future<void>fetchstoryviews()async{
     final docsnap=await _firestore.collection('Stories').doc(widget.UID).get();
     if(docsnap.exists){
@@ -55,8 +58,17 @@ class _StoryPageState extends State<StoryPage> with SingleTickerProviderStateMix
     if(_auth.currentUser!.uid==widget.UID && storyviews.contains(_auth.currentUser!.uid)){
       storyviews.remove(_auth.currentUser!.uid);
     }
+    for(int i=0;i<storyviews.length;i++){
+      final Docsnap=await _firestore.collection('User Details').doc(storyviews[i]).get();
+      if(Docsnap.exists){
+        setState(() {
+          storynames.add(Docsnap.data()?['Name']);
+          storypfp.add(Docsnap.data()?['Profile Pic']);
+        });
+      }
+    }
     if (kDebugMode) {
-      print('Viewers $storyviews');
+      print('Viewers $storylikers');
     }
   }
   @override
@@ -67,12 +79,12 @@ class _StoryPageState extends State<StoryPage> with SingleTickerProviderStateMix
     fetchstoryviews();
     // Initialize the animation controller to run for 7 seconds
     _controller = AnimationController(
-      duration: const Duration(seconds: 7),
+      duration: const Duration(seconds: 900),
       vsync: this,
     )..forward();  // Start the animation immediately
 
     // Automatically pop the page after 7 seconds
-    Future.delayed(const Duration(seconds: 7), () {
+    Future.delayed(const Duration(seconds: 900), () {
       if (mounted) {
         Navigator.pop(context);
       }
@@ -205,7 +217,57 @@ class _StoryPageState extends State<StoryPage> with SingleTickerProviderStateMix
                   const SizedBox(
                     height: 10,
                   ),
-                  const Icon(CupertinoIcons.eye_solid,color: Colors.white,),
+                  InkWell(
+                      onTap: (){
+                        showModalBottomSheet(context: context,
+                            backgroundColor: Colors.black,
+                            builder: (context) {
+                              return ListView.builder(
+                                itemCount: storyviews.length,
+                                itemBuilder: (context, index) {
+                                return Column(
+                                  children: [
+                                    const SizedBox(
+                                      height: 50,
+                                    ),
+                                  Row(
+                                    children: [
+                                      const SizedBox(
+                                        width: 20,
+                                      ),
+                                      InkWell(
+                                        onTap:(){
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => OtherProfilePage(userid: storyviews[index]),));
+                                  },
+                                        child: CircleAvatar(
+                                          radius: 20,
+                                          backgroundImage: NetworkImage(storypfp[index]),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      InkWell(
+                                        onTap:(){
+                                          Navigator.push(context, MaterialPageRoute(builder: (context) => OtherProfilePage(userid: storyviews[index]),));
+                                        },
+                                        child: Text(storynames[index],style: GoogleFonts.poppins(
+                                          color: Colors.white
+                                        ),),
+                                      ),
+                                      const SizedBox(
+                                        width: 20,
+                                      ),
+                                      if(storylikers.contains(storyviews[index]))
+                                        const Icon(CupertinoIcons.heart_fill,color: Colors.red,size: 15,)
+                                    ],
+                                  )
+                                  ],
+                                );
+                              },);
+                            },);
+                      },
+                      child: const Icon(CupertinoIcons.eye_solid,color: Colors.white,)),
                   Text('${storyviews.length} Viewers',style: GoogleFonts.poppins(color: Colors.white,fontSize: 12),)
                 ],
               )):Container(),
