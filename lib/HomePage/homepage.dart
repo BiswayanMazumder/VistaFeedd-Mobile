@@ -645,11 +645,22 @@ class _HomePageState extends State<HomePage> {
                                 const SizedBox(
                                   width: 15,
                                 ),
-                                Text(
-                                  postusername[index],
-                                  style: GoogleFonts.poppins(
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white),
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              OtherProfilePage(
+                                                  userid: postuid[index]),
+                                        ));
+                                  },
+                                  child: Text(
+                                    postusername[index],
+                                    style: GoogleFonts.poppins(
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white),
+                                  ),
                                 ),
                                 const SizedBox(
                                   width: 10,
