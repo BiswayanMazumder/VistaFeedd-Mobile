@@ -38,12 +38,19 @@ class _StoryPageState extends State<StoryPage> with SingleTickerProviderStateMix
     });
   }
   List<dynamic>storyviews=[];
+  List<dynamic> storylikers=[];
   Future<void>fetchstoryviews()async{
     final docsnap=await _firestore.collection('Stories').doc(widget.UID).get();
     if(docsnap.exists){
       setState(() {
         storyviews=docsnap.data()?['Viewers'];
+        storylikers=docsnap.data()?['Likes'];
       });
+      if(storylikers.contains(_auth.currentUser!.uid)){
+        setState(() {
+          _isliked=true;
+        });
+      }
     }
     if(_auth.currentUser!.uid==widget.UID && storyviews.contains(_auth.currentUser!.uid)){
       storyviews.remove(_auth.currentUser!.uid);
@@ -60,12 +67,12 @@ class _StoryPageState extends State<StoryPage> with SingleTickerProviderStateMix
     fetchstoryviews();
     // Initialize the animation controller to run for 7 seconds
     _controller = AnimationController(
-      duration: const Duration(seconds: 900),
+      duration: const Duration(seconds: 7),
       vsync: this,
     )..forward();  // Start the animation immediately
 
     // Automatically pop the page after 7 seconds
-    Future.delayed(const Duration(seconds: 900), () {
+    Future.delayed(const Duration(seconds: 7), () {
       if (mounted) {
         Navigator.pop(context);
       }
@@ -105,7 +112,7 @@ class _StoryPageState extends State<StoryPage> with SingleTickerProviderStateMix
       return '${(difference.inDays / 365).floor()} year ';
     }
   }
-
+  bool _isliked=false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -202,6 +209,29 @@ class _StoryPageState extends State<StoryPage> with SingleTickerProviderStateMix
                   Text('${storyviews.length} Viewers',style: GoogleFonts.poppins(color: Colors.white,fontSize: 12),)
                 ],
               )):Container(),
+        widget.UID!=_auth.currentUser!.uid?  Positioned(
+              top:MediaQuery.sizeOf(context).height-50 ,
+              right: 10,
+              child: InkWell(
+                onTap: () async {
+                  if (_isliked) {
+                    await _firestore.collection('Stories').doc(widget.UID).update({
+                      'Likes': FieldValue.arrayRemove([_auth.currentUser!.uid]),
+                    });
+                    setState(() {
+                      _isliked = false;
+                    });
+                  } else {
+                    await _firestore.collection('Stories').doc(widget.UID).update({
+                      'Likes': FieldValue.arrayUnion([_auth.currentUser!.uid]),
+                    });
+                    setState(() {
+                      _isliked = true;
+                    });
+                  }
+                },
+                child: Icon(_isliked?CupertinoIcons.heart_fill:CupertinoIcons.heart,color:_isliked?Colors.red: Colors.white,),
+          )):Container()
         ],
       ),
     );
