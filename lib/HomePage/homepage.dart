@@ -328,108 +328,113 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(
                     height: 20,
                   ),
-                   SingleChildScrollView(
-                     scrollDirection: Axis.horizontal,
-                     child: Row(
-                      children: [
-
-                        Column(
-                          children: [
-                            Stack(
-                              children: [
-                                CircleAvatar(
-                                  radius:storyURL!=null? 37:35,
-                                  backgroundColor:storyURL!=null? Colors.green:Colors.black,
-                                  child: InkWell(
-                                    onTap: (){
-                                      if(storyURL!=null){
-                                        Navigator.push(context, MaterialPageRoute(builder: (context) =>StoryPage(
-                                          PFP: PFP,
-                                          UploadDate: uploaddate,
-                                          storylink: storyURL,
-                                          username: username,
-                                          UID: _auth.currentUser!.uid,
-                                        )));
-                                      }
-                                    },
-                                    child: CircleAvatar(
-                                      radius: 35,
-                                      backgroundColor: Colors.white,
-                                      backgroundImage: NetworkImage(PFP),
+                   Align(
+                     alignment: Alignment.bottomLeft,
+                     child: SingleChildScrollView(
+                       scrollDirection: Axis.horizontal,
+                       child: Row(
+                        children: [
+                          const SizedBox(
+                            width: 30,
+                          ),
+                          Column(
+                            children: [
+                              Stack(
+                                children: [
+                                  CircleAvatar(
+                                    radius:storyURL!=null? 37:35,
+                                    backgroundColor:storyURL!=null? Colors.green:Colors.black,
+                                    child: InkWell(
+                                      onTap: (){
+                                        if(storyURL!=null){
+                                          Navigator.push(context, MaterialPageRoute(builder: (context) =>StoryPage(
+                                            PFP: PFP,
+                                            UploadDate: uploaddate,
+                                            storylink: storyURL,
+                                            username: username,
+                                            UID: _auth.currentUser!.uid,
+                                          )));
+                                        }
+                                      },
+                                      child: CircleAvatar(
+                                        radius: 35,
+                                        backgroundColor: Colors.white,
+                                        backgroundImage: NetworkImage(PFP),
+                                      ),
                                     ),
                                   ),
-                                ),
-                               storyURL!=null?  Positioned(
-                                    right: 2,
-                                    top: 50,
-                                    child:CircleAvatar(
-                                      backgroundColor: Colors.blue,radius: 10,
-                                      child: InkWell(
-                                        onTap: (){},
-                                        child:const Icon(Icons.add,color: Colors.white,size: 15,) ,
-                                      ),) ):Container()
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Text('Your story',style: GoogleFonts.poppins(
-                              color: Colors.white,
-                              fontSize: 12
-                            ),)
-                          ],
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        for(int i=0;i<storiesuploaderuid.length;i++)
-                          Row(
-                            children: [
-                              Column(
-                                children: [
-                                  Stack(
-                                    children: [
-                                      CircleAvatar(
-                                        radius: 37,
-                                        backgroundColor:Colors.green,
+                                 storyURL!=null?  Positioned(
+                                      right: 2,
+                                      top: 50,
+                                      child:CircleAvatar(
+                                        backgroundColor: Colors.blue,radius: 10,
                                         child: InkWell(
-                                          onTap: (){
-
-                                            Navigator.push(context, MaterialPageRoute(builder: (context) =>StoryPage(
-                                              PFP: storiesuploadpfp[i],
-                                              UploadDate: uploaddate,
-                                              storylink: storiesurl[i],
-                                              username: storiesuploadname[i],
-                                              UID: storiesuploaderuid[i],
-                                            )));
-
-                                          },
-                                          child: CircleAvatar(
-                                            radius: 35,
-                                            backgroundColor: Colors.white,
-                                            backgroundImage: NetworkImage(storiesuploadpfp[i]),
-                                          ),
-                                        ),
-                                      ),
-
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  Text(storiesuploadname[i],style: GoogleFonts.poppins(
-                                      color: Colors.white,
-                                      fontSize: 12
-                                  ),)
+                                          onTap: (){},
+                                          child:const Icon(Icons.add,color: Colors.white,size: 15,) ,
+                                        ),) ):Container()
                                 ],
                               ),
                               const SizedBox(
-                                width: 10,
+                                height: 10,
                               ),
+                              Text('Your story',style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 12
+                              ),)
                             ],
-                          )
-                      ],
-                                       ),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          for(int i=0;i<storiesuploaderuid.length;i++)
+                            Row(
+                              children: [
+                                Column(
+                                  children: [
+                                    Stack(
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 37,
+                                          backgroundColor:Colors.green,
+                                          child: InkWell(
+                                            onTap: (){
+
+                                              Navigator.push(context, MaterialPageRoute(builder: (context) =>StoryPage(
+                                                PFP: storiesuploadpfp[i],
+                                                UploadDate: uploaddate,
+                                                storylink: storiesurl[i],
+                                                username: storiesuploadname[i],
+                                                UID: storiesuploaderuid[i],
+                                              )));
+
+                                            },
+                                            child: CircleAvatar(
+                                              radius: 35,
+                                              backgroundColor: Colors.white,
+                                              backgroundImage: NetworkImage(storiesuploadpfp[i]),
+                                            ),
+                                          ),
+                                        ),
+
+                                      ],
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    Text(storiesuploadname[i],style: GoogleFonts.poppins(
+                                        color: Colors.white,
+                                        fontSize: 12
+                                    ),)
+                                  ],
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                              ],
+                            )
+                        ],
+                                         ),
+                     ),
                    ),
                   const SizedBox(
                     height: 10,
