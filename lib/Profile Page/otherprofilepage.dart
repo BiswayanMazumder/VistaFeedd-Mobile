@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -193,23 +194,33 @@ class _OtherProfilePageState extends State<OtherProfilePage> with SingleTickerPr
     super.dispose();
   }
 
-  void _startAnimationAndNavigate() {
+  void _startAnimationAndNavigate()async {
+    await fetchstories();
     _controller.forward(); // Start rotation
     // Delay navigation until after the animation completes (5 seconds)
-    Future.delayed(Duration(seconds: 5), () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => StoryPage(
-            PFP: pfp,
-            username:usernames,
-            storylink: storyURL,
-            UploadDate:uploaddate,
-            UID: widget.userid,
+    if(storyURL!=''){
+      Future.delayed(Duration(seconds: 5), () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => StoryPage(
+              PFP: pfp,
+              username:usernames,
+              storylink: storyURL,
+              UploadDate:uploaddate,
+              UID: widget.userid,
+            ),
           ),
-        ),
-      );
-    });
+        );
+      });
+    }else{
+      final imageProvider = Image.network(pfp).image;
+      showImageViewer(context, imageProvider, onViewerDismissed: () {
+        if (kDebugMode) {
+          print("dismissed");
+        }
+      });
+    }
   }
   bool ispostsecttion=true;
   bool isreelsection=false;

@@ -37,6 +37,7 @@ class _HomePageState extends State<HomePage> {
   List<dynamic> storiesuploaddate = [];
   List<dynamic> storiesuploadname = [];
   List<dynamic> storiesuploadpfp = [];
+  List<DateTime?> uploaddates=[];
   String pfp = '';
   String usernames = '';
   String PFP = '';
@@ -164,7 +165,14 @@ class _HomePageState extends State<HomePage> {
       Timestamp? timestamp = docsnap.data()?['Upload Date'];
       uploaddate = timestamp?.toDate();
     }
+    if (kDebugMode) {
+      print('Story Link $storyURL');
+    }
   }
+
+  // import 'package:cloud_firestore/cloud_firestore.dart';
+
+  // List<DateTime?> uploaddates = [];
 
   Future<void> fetchotherstories() async {
     await fetchfollowing();
@@ -173,6 +181,14 @@ class _HomePageState extends State<HomePage> {
       if (docsnap.exists) {
         storiesurl.add(docsnap.data()?['Story Link']);
         storiesuploaderuid.add(docsnap.data()?['Uploader UID']);
+
+        // Check if the 'Upload Date' field exists and convert from Timestamp to DateTime
+        var uploadDate = docsnap.data()?['Upload Date'];
+        if (uploadDate != null && uploadDate is Timestamp) {
+          uploaddates.add(uploadDate.toDate()); // Convert to DateTime
+        } else {
+          uploaddates.add(null); // Add null if no valid upload date exists
+        }
       }
     }
     for (int i = 0; i < storiesuploaderuid.length; i++) {
@@ -183,6 +199,7 @@ class _HomePageState extends State<HomePage> {
       }
     }
   }
+
 
   Future<void> fetchdata() async {
     await fetchpostuserdetails();
@@ -287,6 +304,7 @@ class _HomePageState extends State<HomePage> {
               ),
         backgroundColor: Colors.black,
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: const Image(
             image: NetworkImage(
                 'https://firebasestorage.googleapis.com/v0/b/vistafeedd.appspot.'
@@ -342,11 +360,11 @@ class _HomePageState extends State<HomePage> {
                               Stack(
                                 children: [
                                   CircleAvatar(
-                                    radius:storyURL!=null? 37:35,
-                                    backgroundColor:storyURL!=null? Colors.green:Colors.black,
+                                    radius:storyURL!=''? 37:35,
+                                    backgroundColor:storyURL!=''? Colors.green:Colors.black,
                                     child: InkWell(
                                       onTap: (){
-                                        if(storyURL!=null){
+                                        if(storyURL!=''){
                                           Navigator.push(context, MaterialPageRoute(builder: (context) =>StoryPage(
                                             PFP: PFP,
                                             UploadDate: uploaddate,
@@ -401,7 +419,7 @@ class _HomePageState extends State<HomePage> {
 
                                               Navigator.push(context, MaterialPageRoute(builder: (context) =>StoryPage(
                                                 PFP: storiesuploadpfp[i],
-                                                UploadDate: uploaddate,
+                                                UploadDate: uploaddates[i],
                                                 storylink: storiesurl[i],
                                                 username: storiesuploadname[i],
                                                 UID: storiesuploaderuid[i],

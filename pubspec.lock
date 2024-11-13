@@ -129,6 +129,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.10"
+  easy_image_viewer:
+    dependency: "direct main"
+    description:
+      name: easy_image_viewer
+      sha256: fb6cb123c3605552cc91150dcdb50ca977001dcddfb71d20caa0c5edc9a80947
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.5.1"
   fake_async:
     dependency: transitive
     description:
@@ -224,6 +232,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  full_screen_image:
+    dependency: "direct main"
+    description:
+      name: full_screen_image
+      sha256: "97831b00d07b17c674ba3a4eddcee306dbd0d7c66851f1b67856e12daeb9b3aa"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
   google_fonts:
     dependency: "direct main"
     description:

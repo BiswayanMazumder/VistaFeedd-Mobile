@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:palette_generator/palette_generator.dart';
+import 'package:vistafeedd/HomePage/homepage.dart';
 import 'package:vistafeedd/Profile%20Page/profilepage.dart';
 
 class StoryPage extends StatefulWidget {
@@ -46,7 +48,9 @@ class _StoryPageState extends State<StoryPage> with SingleTickerProviderStateMix
     if(_auth.currentUser!.uid==widget.UID && storyviews.contains(_auth.currentUser!.uid)){
       storyviews.remove(_auth.currentUser!.uid);
     }
-    print('Viewers $storyviews');
+    if (kDebugMode) {
+      print('Viewers $storyviews');
+    }
   }
   @override
   void initState() {
@@ -56,12 +60,12 @@ class _StoryPageState extends State<StoryPage> with SingleTickerProviderStateMix
     fetchstoryviews();
     // Initialize the animation controller to run for 7 seconds
     _controller = AnimationController(
-      duration: const Duration(seconds: 7),
+      duration: const Duration(seconds: 900),
       vsync: this,
     )..forward();  // Start the animation immediately
 
     // Automatically pop the page after 7 seconds
-    Future.delayed(const Duration(seconds: 7), () {
+    Future.delayed(const Duration(seconds: 900), () {
       if (mounted) {
         Navigator.pop(context);
       }
@@ -181,10 +185,19 @@ class _StoryPageState extends State<StoryPage> with SingleTickerProviderStateMix
             ),
           ),
          _auth.currentUser!.uid==widget.UID? Positioned(
-            top: MediaQuery.sizeOf(context).height-55,
+            top: MediaQuery.sizeOf(context).height-80,
             left: 10,
               child: Column(
                 children: [
+                  InkWell(
+                      onTap:()async{
+                        await _firestore.collection('Stories').doc(_auth.currentUser!.uid).delete();
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage(),));
+                      },
+                      child: const Icon(CupertinoIcons.delete,color: Colors.red,)),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   const Icon(CupertinoIcons.eye_solid,color: Colors.white,),
                   Text('${storyviews.length} Viewers',style: GoogleFonts.poppins(color: Colors.white,fontSize: 12),)
                 ],

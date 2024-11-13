@@ -44,6 +44,8 @@ dependencies:
   zoom_pinch_overlay: ^1.4.3
   connectivity_plus: ^6.0.3
   palette_generator: ^0.3.3+4
+  full_screen_image: ^2.0.0
+  easy_image_viewer: ^1.5.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

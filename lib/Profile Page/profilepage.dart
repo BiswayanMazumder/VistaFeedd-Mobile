@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -321,13 +322,20 @@ class _ProfilePageState extends State<ProfilePage> {
                   padding: const EdgeInsets.only(left: 0.0),
                   child: InkWell(
                     onTap: () {
-                      if(storyURL!=null){
+                      if(storyURL!=''){
                         Navigator.push(context, MaterialPageRoute(builder: (context) => StoryPage(
                             PFP: pfp,
                             username: usernames,
                             storylink: storyURL,
                             UploadDate: uploaddate,
                             UID: widget.userid),));
+                      }else{
+                        final imageProvider = Image.network(pfp).image;
+                        showImageViewer(context, imageProvider, onViewerDismissed: () {
+                          if (kDebugMode) {
+                            print("dismissed");
+                          }
+                        });
                       }
                     },
                     child: Container(
