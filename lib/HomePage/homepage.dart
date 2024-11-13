@@ -402,7 +402,7 @@ class _HomePageState extends State<HomePage> {
                             ],
                           ),
                           const SizedBox(
-                            width: 10,
+                            width: 30,
                           ),
                           for(int i=0;i<storiesuploaderuid.length;i++)
                             Row(

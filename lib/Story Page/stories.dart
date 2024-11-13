@@ -79,12 +79,12 @@ class _StoryPageState extends State<StoryPage> with SingleTickerProviderStateMix
     fetchstoryviews();
     // Initialize the animation controller to run for 7 seconds
     _controller = AnimationController(
-      duration: const Duration(seconds: 900),
+      duration: const Duration(seconds: 7),
       vsync: this,
     )..forward();  // Start the animation immediately
 
     // Automatically pop the page after 7 seconds
-    Future.delayed(const Duration(seconds: 900), () {
+    Future.delayed(const Duration(seconds: 7), () {
       if (mounted) {
         Navigator.pop(context);
       }
