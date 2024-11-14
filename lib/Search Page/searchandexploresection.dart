@@ -9,6 +9,7 @@ import 'package:vistafeedd/HomePage/homepage.dart';
 import 'package:vistafeedd/Post%20Details%20Page/postdetails.dart';
 import 'package:vistafeedd/Profile%20Page/profilepage.dart';
 import 'package:vistafeedd/Search%20Page/SearchPageImageDetailView.dart';
+import 'package:vistafeedd/Search%20Page/SearchResult.dart';
 class SearchAndExplorePage extends StatefulWidget {
   const SearchAndExplorePage({super.key});
 
@@ -72,24 +73,39 @@ class _SearchAndExplorePageState extends State<SearchAndExplorePage> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         automaticallyImplyLeading: false,
-        title:  Container(
-          width: MediaQuery.sizeOf(context).width,
-          // height: 40,
-          color: const Color.fromRGBO(31, 41, 55, 1),
-          child: TextField(
-            decoration: InputDecoration(
-              hintText: 'Search...',
-              // prefixIcon: Icon(Icons.send,color: Colors.white,),
-              hintStyle: GoogleFonts.poppins(
-                color: Colors.white
-              )
-            ),
-            // enabled: false,
-            style: GoogleFonts.poppins(
-              color: Colors.white
-            ),
+        title:  InkWell(
+          onTap: () {
+            // Navigate to the SearchResult page as soon as the user taps
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const SearchResult()),
+            );
+          },
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 10,
+              ),
+              Container(
+                width: MediaQuery.sizeOf(context).width,
+                color: const Color.fromRGBO(31, 41, 55, 1),
+                height: 50,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(
+                      height: 12,
+                    ),
+                    Text('  Search...',style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 18
+                    ),),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ),
+        )
       ),
       bottomNavigationBar: Container(
         width: MediaQuery.sizeOf(context).width,
