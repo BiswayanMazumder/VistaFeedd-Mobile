@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:vistafeedd/HomePage/homepage.dart';
 import 'package:vistafeedd/Post%20Details%20Page/postdetails.dart';
 import 'package:vistafeedd/Profile%20Page/profilepage.dart';
 class SearchAndExplorePage extends StatefulWidget {
@@ -48,12 +49,20 @@ class _SearchAndExplorePageState extends State<SearchAndExplorePage> {
       // usernames = docsnap.data()?['Name'];
     }
   }
+  bool _isLoading=false;
+  Future<void> fetchdata() async {
+    await fetchposts();
+    // await fetchdata();
+    await fetchpfp();
+    setState(() {
+      _isLoading = false;
+    });
+  }
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    fetchpfp();
-    fetchposts();
+    fetchdata();
   }
   @override
   Widget build(BuildContext context) {
@@ -88,7 +97,9 @@ class _SearchAndExplorePageState extends State<SearchAndExplorePage> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             InkWell(
-              onTap: () {},
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage(),));
+              },
               child: SvgPicture.string(
                   '<svg aria-label="Home" class="x1lliihq x1n2onr6 x5n08af" fill="white" height="24" role="img" viewBox="0 0 24 24" width="24"><title>Home</title><path d="M9.005 16.545a2.997 2.997 0 0 1 2.997-2.997A2.997 2.997 0 0 1 15 16.545V22h7V11.543L12 2 2 11.543V22h7.005Z" fill="none" stroke="white" stroke-linejoin="round" stroke-width="2"></path></svg>'),
             ),
@@ -156,7 +167,10 @@ class _SearchAndExplorePageState extends State<SearchAndExplorePage> {
           ],
         ),
       ),
-      body: SingleChildScrollView(
+      body:_isLoading?const Center(child:
+        CircularProgressIndicator(
+          color: Colors.white,
+        ),) :SingleChildScrollView(
         child: Column(
           children: [
             const SizedBox(
