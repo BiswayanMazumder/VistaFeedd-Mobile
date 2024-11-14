@@ -8,6 +8,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:vistafeedd/HomePage/homepage.dart';
 import 'package:vistafeedd/Post%20Details%20Page/postdetails.dart';
 import 'package:vistafeedd/Profile%20Page/profilepage.dart';
+import 'package:vistafeedd/Search%20Page/SearchPageImageDetailView.dart';
 class SearchAndExplorePage extends StatefulWidget {
   const SearchAndExplorePage({super.key});
 
@@ -78,6 +79,7 @@ class _SearchAndExplorePageState extends State<SearchAndExplorePage> {
           child: TextField(
             decoration: InputDecoration(
               hintText: 'Search...',
+              // prefixIcon: Icon(Icons.send,color: Colors.white,),
               hintStyle: GoogleFonts.poppins(
                 color: Colors.white
               )
@@ -190,7 +192,7 @@ class _SearchAndExplorePageState extends State<SearchAndExplorePage> {
                         if (kDebugMode) {
                           print("PIDS ${PIDS[i]}");
                         }
-
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPageImageDetail(PID: PIDS[i], ImageLink: PostLinks[i]),));
                       },
                         child: Image(image: NetworkImage(PostLinks[i]))),
                   ),
