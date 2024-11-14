@@ -467,8 +467,10 @@ class _OtherProfilePageState extends State<OtherProfilePage> with SingleTickerPr
                         color:!followers.contains(_auth.currentUser!.uid)?Color.fromRGBO(0, 149, 246, 7): Color.fromRGBO(54, 54, 54, 7),
                         borderRadius: BorderRadius.all(Radius.circular(10))),
                     child: Center(
-                      child: Text(
-                        !followers.contains(_auth.currentUser!.uid)?'Follow':'Following',
+                      child: Text( //b follows a but a doesnot follow b
+                        //following - me but followers not me followback
+                        followers.contains(_auth.currentUser!.uid)?'Following':following.contains(_auth.currentUser!.uid)&&!followers.contains(_auth.currentUser!.uid)?
+                        'Follow Back':'Follow',
                         style: GoogleFonts.poppins(color: Colors.white),
                       ),
                     ),
