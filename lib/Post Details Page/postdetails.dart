@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -6,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:video_player/video_player.dart';
+import 'package:vistafeedd/Profile%20Page/otherprofilepage.dart';
+import 'package:vistafeedd/Profile%20Page/profilepage.dart';
 class PostDetails extends StatefulWidget {
   final String UID;
   PostDetails({required this.UID});
@@ -171,6 +175,79 @@ class _PostDetailsState extends State<PostDetails> {
       print('Liked: $isliked');
     } // Should now print true/false values
   }
+  final TextEditingController _commentController=TextEditingController();
+  int number=0;
+  Future<void> generateAndPrint8DigitNumber()async {
+    Random random = Random();
+    // Generate a random number between 10000000 and 99999999 (inclusive)
+    setState(() {
+      number = 10000000 + random.nextInt(90000000);
+    });
+    print('Generated 8-digit number: $number');
+  }
+  Future<void> writecomment(String postid)async{
+    await generateAndPrint8DigitNumber();
+    int cid=number;
+    await _firestore.collection('Comment IDs').doc(postid).set({
+      'IDs':FieldValue.arrayUnion([cid])
+    },SetOptions(merge: true));
+    await _firestore.collection('Comment Details').doc(cid.toString()).set(
+        {
+          'Comment ID':cid,
+          'Comment Text':_commentController.text,
+          'Comment Owner':_auth.currentUser!.uid,
+          'Post ID':postid,
+          'Comment Date':FieldValue.serverTimestamp(),
+          'Likes':[]
+        });
+  }
+  List<dynamic> commenttext=[];
+  List<dynamic> commentdate=[];
+  List<dynamic> commentuid=[];
+  List<dynamic> commentname=[];
+  List<dynamic> commentpfp=[];
+  List<dynamic> commentid=[];
+  Future<void> fetchcomment(String PostID)async{
+    if (kDebugMode) {
+      print('PID Comment $PostID');
+    }
+    commentid.clear();
+    // commentdate.clear();
+    commentdate.clear();
+    commentuid.clear();
+    commenttext.clear();
+    commentname.clear();
+    commentpfp.clear();
+    final docsnap=await _firestore.collection('Comment IDs').doc(PostID).get();
+    if(docsnap.exists){
+
+      setState(() {
+        commentid=docsnap.data()?['IDs']??[];
+      });
+    }
+    for(int i=0;i<commentid.length;i++){
+      final Docsnap=await _firestore.collection('Comment Details').doc(commentid[i].toString()).get();
+      if(Docsnap.exists){
+        setState(() {
+          commenttext.add(Docsnap.data()?['Comment Text']);
+          commentuid.add(Docsnap.data()?['Comment Owner']);
+          commentdate.add(Docsnap.data()?['Comment Date']); // Assuming you meant to fetch 'Comment Date'
+        });
+      }
+    }
+    for(int j=0;j<commentuid.length;j++){
+      final usersnap=await _firestore.collection('User Details').doc(commentuid[j]).get();
+      if(usersnap.exists){
+        setState(() {
+          commentname.add(usersnap.data()?['Name']);
+          commentpfp.add(usersnap.data()?['Profile Pic']);
+        });
+      }
+    }
+    if (kDebugMode) {
+      print("CID $commentname");
+    }
+  }
   @override
   void initState() {
     super.initState();
@@ -330,10 +407,128 @@ bool isLoading=true;
                 const SizedBox(
                   width: 20,
                 ),
-                SizedBox(
-                  width: 25,
-                  height: 25,
-                  child: SvgPicture.string('<svg aria-label="Comment" fill="currentColor" height="24" viewBox="0 0 24 24" width="24"><path d="M20.656 17.008a9.993 9.993 0 1 0-3.59 3.615L22 22Z" fill="none" stroke="white" stroke-linejoin="round" stroke-width="2"></path></svg>'),
+                InkWell(
+                  onTap:()async{
+                    await fetchcomment(PIDS[index]);
+                    showModalBottomSheet(
+                      context: context,
+                      backgroundColor: Colors.black,
+                      builder: (context) {
+                        return Container(
+                          width: MediaQuery.of(context).size.width,
+                          child: Column(
+                            children: [
+                              // Scrollable content above the TextField
+                              Expanded(
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    children: [
+                                      // Add your content here
+                                      for (int i = 0; i < commentid.length; i++)
+                                        Container(
+                                            padding: EdgeInsets.only(top: 20,bottom: 35),
+                                            child: Column(
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    const SizedBox(
+                                                      width: 15,
+                                                    ),
+                                                    InkWell(
+                                                      onTap: (){
+                                                        _auth.currentUser!.uid==commentuid[i]?Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePage(userid: commentuid[i]),)):
+                                                        Navigator.push(context, MaterialPageRoute(builder: (context) => OtherProfilePage(userid: commentuid[i]),));
+                                                      },
+                                                      child: Container(
+                                                        height: 35,
+                                                        width: 35,
+                                                        decoration: const BoxDecoration(
+                                                          color: Colors.white,
+                                                          borderRadius: BorderRadius.all(Radius.circular(50)),
+                                                        ),
+                                                        child: ClipOval(
+                                                          child: Image.network(
+                                                            commentpfp[i],
+                                                            height: 35,
+                                                            width: 35,
+                                                            fit: BoxFit.cover,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(
+                                                      width: 5,
+                                                    ),
+                                                    InkWell(
+                                                        onTap: (){
+                                                          _auth.currentUser!.uid==commentuid[i]?Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePage(userid: commentuid[i]),)):
+                                                          Navigator.push(context, MaterialPageRoute(builder: (context) => OtherProfilePage(userid: commentuid[i]),));
+                                                        },
+                                                        child: Column(
+                                                          mainAxisAlignment: MainAxisAlignment.start,
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            Text(commentname[i],style: GoogleFonts.poppins(
+                                                                color: Colors.white,
+                                                                fontSize: 15,
+                                                                fontWeight: FontWeight.w600
+                                                            ),),
+                                                            const SizedBox(
+                                                              width: 8,
+                                                            ),
+                                                            Row(
+                                                              children: [
+                                                                Text(commenttext[i],style: GoogleFonts.poppins(
+                                                                    color: Colors.white,
+                                                                    fontWeight: FontWeight.w300,fontSize: 15
+                                                                ),),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        )
+                                                    ),
+                                                  ],
+                                                )
+                                              ],
+                                            )
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              // Fixed TextField at the bottom
+                              Container(
+                                width: MediaQuery.of(context).size.width,
+                                color: const Color.fromRGBO(31, 41, 55, 1),
+                                child: TextField(
+                                  controller:_commentController,
+                                  decoration: InputDecoration(
+                                    suffixIcon: InkWell(
+                                        onTap:()async{
+                                          if(_commentController.text.isNotEmpty){
+                                            await writecomment(PIDS[index].toString());
+                                            _commentController.clear();
+                                            Navigator.pop(context);
+                                          }
+                                        },
+                                        child: const Icon(Icons.send,color: Colors.white,)),
+                                    hintText: 'Comment...',
+                                    hintStyle: GoogleFonts.poppins(color: Colors.white),
+                                  ),
+                                  style: GoogleFonts.poppins(color: Colors.white),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
+                  child: SizedBox(
+                    width: 25,
+                    height: 25,
+                    child: SvgPicture.string('<svg aria-label="Comment" fill="currentColor" height="24" viewBox="0 0 24 24" width="24"><path d="M20.656 17.008a9.993 9.993 0 1 0-3.59 3.615L22 22Z" fill="none" stroke="white" stroke-linejoin="round" stroke-width="2"></path></svg>'),
+                  ),
                 ),
               ],
             )
