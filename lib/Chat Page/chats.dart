@@ -121,7 +121,7 @@ class _ChatsState extends State<Chats> {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
     }
@@ -137,6 +137,9 @@ class _ChatsState extends State<Chats> {
   @override
   void dispose() {
     _timer?.cancel();
+    if (kDebugMode) {
+      print('Disposed');
+    }
     _messageController.dispose(); // Dispose the controller
     _scrollController.dispose(); // Dispose the ScrollController
     super.dispose();
@@ -152,7 +155,7 @@ class _ChatsState extends State<Chats> {
           onTap: () {
             Navigator.pop(context);
           },
-          child: Icon(
+          child: const Icon(
             CupertinoIcons.back,
             color: Colors.white,
           ),

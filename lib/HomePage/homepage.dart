@@ -11,6 +11,7 @@ import 'package:vistafeedd/Profile%20Page/otherprofilepage.dart';
 import 'package:vistafeedd/Profile%20Page/profilepage.dart';
 import 'package:vistafeedd/Search%20Page/searchandexploresection.dart';
 import 'package:vistafeedd/Story%20Page/stories.dart';
+import 'package:vistafeedd/Upload%20Post/CreatePost.dart';
 import 'package:zoom_pinch_overlay/zoom_pinch_overlay.dart';
 
 class HomePage extends StatefulWidget {
@@ -322,7 +323,9 @@ class _HomePageState extends State<HomePage> {
                           '<svg aria-label="Search" class="x1lliihq x1n2onr6 x5n08af" fill="white" height="24" role="img" viewBox="0 0 24 24" width="24"><title>Search</title><path d="M19 10.5A8.5 8.5 0 1 1 10.5 2a8.5 8.5 0 0 1 8.5 8.5Z" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><line fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="16.511" x2="22" y1="16.511" y2="22"></line></svg>'),
                     ),
                     InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const CreatePost(),));
+                      },
                       child: SizedBox(
                         height: 22,
                         width: 22,
