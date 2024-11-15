@@ -30,6 +30,7 @@ class _ChatsState extends State<Chats> {
   List<dynamic> messagesender = [];
   bool _isLoading = true;
   Timer? _timer; // Timer to fetch messages every second
+  ScrollController _scrollController = ScrollController(); // Controller for scrolling
 
   Future<void> fetchmessages() async {
     try {
@@ -75,6 +76,9 @@ class _ChatsState extends State<Chats> {
         messagetimes = sortedTimes;
         messagesender = sortedSenders;
       });
+
+      // Scroll to the bottom when messages are fetched
+      _scrollToBottom();
     } catch (e) {
       if (kDebugMode) {
         print('Error fetching messages: $e');
@@ -98,7 +102,7 @@ class _ChatsState extends State<Chats> {
             .collection('Messages')
             .add({
           'message': message,
-          'seen':false,
+          'seen': false,
           'senderId': _auth.currentUser!.uid,
           'timestamp': FieldValue.serverTimestamp(),
         });
@@ -109,6 +113,17 @@ class _ChatsState extends State<Chats> {
           print('Error sending message: $e');
         }
       }
+    }
+  }
+
+  // Function to scroll to the bottom
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
     }
   }
 
@@ -123,6 +138,7 @@ class _ChatsState extends State<Chats> {
   void dispose() {
     _timer?.cancel();
     _messageController.dispose(); // Dispose the controller
+    _scrollController.dispose(); // Dispose the ScrollController
     super.dispose();
   }
 
@@ -167,59 +183,56 @@ class _ChatsState extends State<Chats> {
               height: 50,
             ),
             Expanded(
-              child: Column(
-                children: [
-                  for (int i = 0; i < messages.length; i++)
-                    Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              bottom: 50, left: 20, right: 20),
-                          child: Row(
-                            mainAxisAlignment: messagesender[i] ==
-                                _auth.currentUser!.uid
-                                ? MainAxisAlignment.end
-                                : MainAxisAlignment.start,
-                            children: [
-                              messagesender[i] != _auth.currentUser!.uid
-                                  ? CircleAvatar(
-                                radius: 20,
-                                backgroundImage:
-                                NetworkImage(widget.PFP),
-                              )
-                                  : Container(),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Container(
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(50)),
-                                  color: messagesender[i] ==
-                                      _auth.currentUser!.uid
-                                      ? Colors.blue
-                                      : const Color.fromRGBO(
-                                      33, 33, 33, 1),
+              child: SingleChildScrollView(
+                controller: _scrollController, // Attach the ScrollController here
+                child: Column(
+                  children: [
+                    for (int i = 0; i < messages.length; i++)
+                      Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                bottom: 50, left: 20, right: 20),
+                            child: Row(
+                              mainAxisAlignment: messagesender[i] ==
+                                  _auth.currentUser!.uid
+                                  ? MainAxisAlignment.end
+                                  : MainAxisAlignment.start,
+                              children: [
+                                messagesender[i] != _auth.currentUser!.uid
+                                    ? CircleAvatar(
+                                  radius: 20,
+                                  backgroundImage: NetworkImage(widget.PFP),
+                                )
+                                    : Container(),
+                                const SizedBox(
+                                  width: 10,
                                 ),
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 10, right: 10),
-                                  child: Center(
-                                    child: Text(
-                                      messages[i],
-                                      style: GoogleFonts.poppins(
-                                          color: CupertinoColors.white),
+                                Container(
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(Radius.circular(50)),
+                                    color: messagesender[i] == _auth.currentUser!.uid
+                                        ? Colors.blue
+                                        : const Color.fromRGBO(33, 33, 33, 1),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 10, right: 10),
+                                    child: Center(
+                                      child: Text(
+                                        messages[i],
+                                        style: GoogleFonts.poppins(color: CupertinoColors.white),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
-                    )
-                ],
+                              ],
+                            ),
+                          )
+                        ],
+                      )
+                  ],
+                ),
               ),
             ),
             Container(
@@ -241,7 +254,7 @@ class _ChatsState extends State<Chats> {
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.send, color: Colors.white),
+                    icon: const Icon(Icons.send, color: Colors.white),
                     onPressed: sendMessage, // Call sendMessage when pressed
                   )
                 ],
