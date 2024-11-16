@@ -42,7 +42,7 @@ class _HomePageState extends State<HomePage> {
   List<dynamic> storiesuploaddate = [];
   List<dynamic> storiesuploadname = [];
   List<dynamic> storiesuploadpfp = [];
-  List<DateTime?> uploaddates=[];
+  List<DateTime?> uploaddates = [];
   String pfp = '';
   String usernames = '';
   String PFP = '';
@@ -52,7 +52,10 @@ class _HomePageState extends State<HomePage> {
 
 // Fetch the list of following users
   Future<void> fetchfollowing() async {
-    final docsnap = await _firestore.collection('Following').doc(_auth.currentUser!.uid).get();
+    final docsnap = await _firestore
+        .collection('Following')
+        .doc(_auth.currentUser!.uid)
+        .get();
     if (docsnap.exists) {
       following = docsnap.data()?['Following ID'] ?? [];
     }
@@ -64,7 +67,8 @@ class _HomePageState extends State<HomePage> {
     List postID = [];
 
     try {
-      final docsnap = await _firestore.collection('Global Post IDs').doc('Posts').get();
+      final docsnap =
+          await _firestore.collection('Global Post IDs').doc('Posts').get();
       if (docsnap.exists) {
         postID = docsnap.data()?['Post IDs'] ?? [];
       }
@@ -76,7 +80,8 @@ class _HomePageState extends State<HomePage> {
       List<dynamic> temppostid = [];
 
       for (int i = 0; i < postID.length; i++) {
-        final postdata = await _firestore.collection('Global Post').doc(postID[i]).get();
+        final postdata =
+            await _firestore.collection('Global Post').doc(postID[i]).get();
         if (postdata.exists) {
           final postUid = postdata.data()?['Uploaded UID'];
           if (following.contains(postUid)) {
@@ -99,7 +104,6 @@ class _HomePageState extends State<HomePage> {
       postcaption = tempPostCaption;
       postdate = tempPostDate;
       PID = temppostid;
-
     } catch (e) {
       print('Posts error: $e');
     }
@@ -110,7 +114,8 @@ class _HomePageState extends State<HomePage> {
     try {
       await fetchposts();
       for (int i = 0; i < postuid.length; i++) {
-        final docsnap = await _firestore.collection('User Details').doc(postuid[i]).get();
+        final docsnap =
+            await _firestore.collection('User Details').doc(postuid[i]).get();
         if (docsnap.exists) {
           postusername.add(docsnap.data()?['Name']);
           postuserpfps.add(docsnap.data()?['Profile Pic']);
@@ -123,7 +128,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> fetchpfp() async {
-    final docsnap = await _firestore.collection('User Details').doc(_auth.currentUser!.uid).get();
+    final docsnap = await _firestore
+        .collection('User Details')
+        .doc(_auth.currentUser!.uid)
+        .get();
     if (docsnap.exists) {
       pfp = docsnap.data()?['Profile Pic'];
       usernames = docsnap.data()?['Name'];
@@ -138,7 +146,8 @@ class _HomePageState extends State<HomePage> {
     }
 
     for (int i = 0; i < PID.length; i++) {
-      final docsnap = await _firestore.collection('Post Likes').doc(PID[i]).get();
+      final docsnap =
+          await _firestore.collection('Post Likes').doc(PID[i]).get();
       if (docsnap.exists) {
         final likes = docsnap.data()?['likes'] ?? [];
         isliked.add(likes.contains(_auth.currentUser!.uid));
@@ -149,14 +158,20 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> fetchsavedposts() async {
-    final docsnap = await _firestore.collection('Saved Posts').doc(_auth.currentUser!.uid).get();
+    final docsnap = await _firestore
+        .collection('Saved Posts')
+        .doc(_auth.currentUser!.uid)
+        .get();
     if (docsnap.exists) {
       savedposts = (docsnap.data()?['POST IDs']);
     }
   }
 
   Future<void> fetchpfps() async {
-    final docsnap = await _firestore.collection('User Details').doc(_auth.currentUser!.uid).get();
+    final docsnap = await _firestore
+        .collection('User Details')
+        .doc(_auth.currentUser!.uid)
+        .get();
     if (docsnap.exists) {
       PFP = docsnap.data()?['Profile Pic'];
       username = docsnap.data()?['Name'];
@@ -164,7 +179,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> fetchstories() async {
-    final docsnap = await _firestore.collection('Stories').doc(_auth.currentUser!.uid).get();
+    final docsnap = await _firestore
+        .collection('Stories')
+        .doc(_auth.currentUser!.uid)
+        .get();
     if (docsnap.exists) {
       storyURL = docsnap.data()?['Story Link'] ?? '';
       Timestamp? timestamp = docsnap.data()?['Upload Date'];
@@ -182,7 +200,8 @@ class _HomePageState extends State<HomePage> {
   Future<void> fetchotherstories() async {
     await fetchfollowing();
     for (int i = 0; i < following.length; i++) {
-      final docsnap = await _firestore.collection('Stories').doc(following[i]).get();
+      final docsnap =
+          await _firestore.collection('Stories').doc(following[i]).get();
       if (docsnap.exists) {
         storiesurl.add(docsnap.data()?['Story Link']);
         storiesuploaderuid.add(docsnap.data()?['Uploader UID']);
@@ -197,14 +216,16 @@ class _HomePageState extends State<HomePage> {
       }
     }
     for (int i = 0; i < storiesuploaderuid.length; i++) {
-      final Docsnap = await _firestore.collection('User Details').doc(storiesuploaderuid[i]).get();
+      final Docsnap = await _firestore
+          .collection('User Details')
+          .doc(storiesuploaderuid[i])
+          .get();
       if (Docsnap.exists) {
         storiesuploadname.add(Docsnap.data()?['Name']);
         storiesuploadpfp.add(Docsnap.data()?['Profile Pic']);
       }
     }
   }
-
 
   Future<void> fetchdata() async {
     await fetchpostuserdetails();
@@ -219,39 +240,41 @@ class _HomePageState extends State<HomePage> {
       _isLoading = false;
     });
   }
-  int number=0;
-  Future<void> generateAndPrint8DigitNumber()async {
+
+  int number = 0;
+  Future<void> generateAndPrint8DigitNumber() async {
     Random random = Random();
     // Generate a random number between 10000000 and 99999999 (inclusive)
-     setState(() {
-       number = 10000000 + random.nextInt(90000000);
-     });
+    setState(() {
+      number = 10000000 + random.nextInt(90000000);
+    });
     print('Generated 8-digit number: $number');
   }
-  final TextEditingController _commentController=TextEditingController();
-  Future<void> writecomment(String postid)async{
+
+  final TextEditingController _commentController = TextEditingController();
+  Future<void> writecomment(String postid) async {
     await generateAndPrint8DigitNumber();
-    int cid=number;
+    int cid = number;
     await _firestore.collection('Comment IDs').doc(postid).set({
-      'IDs':FieldValue.arrayUnion([cid])
-    },SetOptions(merge: true));
-    await _firestore.collection('Comment Details').doc(cid.toString()).set(
-        {
-          'Comment ID':cid,
-          'Comment Text':_commentController.text,
-          'Comment Owner':_auth.currentUser!.uid,
-          'Post ID':postid,
-          'Comment Date':FieldValue.serverTimestamp(),
-          'Likes':[]
-        });
+      'IDs': FieldValue.arrayUnion([cid])
+    }, SetOptions(merge: true));
+    await _firestore.collection('Comment Details').doc(cid.toString()).set({
+      'Comment ID': cid,
+      'Comment Text': _commentController.text,
+      'Comment Owner': _auth.currentUser!.uid,
+      'Post ID': postid,
+      'Comment Date': FieldValue.serverTimestamp(),
+      'Likes': []
+    });
   }
-  List<dynamic> commenttext=[];
-  List<dynamic> commentdate=[];
-  List<dynamic> commentuid=[];
-  List<dynamic> commentname=[];
-  List<dynamic> commentpfp=[];
-  List<dynamic> commentid=[];
-  Future<void> fetchcomment(String PostID)async{
+
+  List<dynamic> commenttext = [];
+  List<dynamic> commentdate = [];
+  List<dynamic> commentuid = [];
+  List<dynamic> commentname = [];
+  List<dynamic> commentpfp = [];
+  List<dynamic> commentid = [];
+  Future<void> fetchcomment(String PostID) async {
     if (kDebugMode) {
       print('PID Comment $PostID');
     }
@@ -262,26 +285,31 @@ class _HomePageState extends State<HomePage> {
     commenttext.clear();
     commentname.clear();
     commentpfp.clear();
-    final docsnap=await _firestore.collection('Comment IDs').doc(PostID).get();
-    if(docsnap.exists){
-
+    final docsnap =
+        await _firestore.collection('Comment IDs').doc(PostID).get();
+    if (docsnap.exists) {
       setState(() {
-        commentid=docsnap.data()?['IDs']??[];
+        commentid = docsnap.data()?['IDs'] ?? [];
       });
     }
-    for(int i=0;i<commentid.length;i++){
-      final Docsnap=await _firestore.collection('Comment Details').doc(commentid[i].toString()).get();
-      if(Docsnap.exists){
+    for (int i = 0; i < commentid.length; i++) {
+      final Docsnap = await _firestore
+          .collection('Comment Details')
+          .doc(commentid[i].toString())
+          .get();
+      if (Docsnap.exists) {
         setState(() {
           commenttext.add(Docsnap.data()?['Comment Text']);
           commentuid.add(Docsnap.data()?['Comment Owner']);
-          commentdate.add(Docsnap.data()?['Comment Date']); // Assuming you meant to fetch 'Comment Date'
+          commentdate.add(Docsnap.data()?[
+              'Comment Date']); // Assuming you meant to fetch 'Comment Date'
         });
       }
     }
-    for(int j=0;j<commentuid.length;j++){
-      final usersnap=await _firestore.collection('User Details').doc(commentuid[j]).get();
-      if(usersnap.exists){
+    for (int j = 0; j < commentuid.length; j++) {
+      final usersnap =
+          await _firestore.collection('User Details').doc(commentuid[j]).get();
+      if (usersnap.exists) {
         setState(() {
           commentname.add(usersnap.data()?['Name']);
           commentpfp.add(usersnap.data()?['Profile Pic']);
@@ -292,6 +320,7 @@ class _HomePageState extends State<HomePage> {
       print("CID $commentname");
     }
   }
+
   @override
   void initState() {
     super.initState();
@@ -317,14 +346,22 @@ class _HomePageState extends State<HomePage> {
                     ),
                     InkWell(
                       onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => SearchAndExplorePage(),));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SearchAndExplorePage(),
+                            ));
                       },
                       child: SvgPicture.string(
                           '<svg aria-label="Search" class="x1lliihq x1n2onr6 x5n08af" fill="white" height="24" role="img" viewBox="0 0 24 24" width="24"><title>Search</title><path d="M19 10.5A8.5 8.5 0 1 1 10.5 2a8.5 8.5 0 0 1 8.5 8.5Z" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><line fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="16.511" x2="22" y1="16.511" y2="22"></line></svg>'),
                     ),
                     InkWell(
                       onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => const CreatePost(),));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const CreatePost(),
+                            ));
                       },
                       child: SizedBox(
                         height: 22,
@@ -405,7 +442,11 @@ class _HomePageState extends State<HomePage> {
                 ),
                 InkWell(
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) =>const ChatScreen(),));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ChatScreen(),
+                        ));
                   },
                   child: SvgPicture.string(
                       '<svg aria-label="Messenger" class="x1lliihq x1n2onr6 x5n08af" fill="white" height="24" role="img" viewBox="0 0 24 24" width="24"><title>Messenger</title><path d="M12.003 2.001a9.705 9.705 0 1 1 0 19.4 10.876 10.876 0 0 1-2.895-.384.798.798 0 0 0-.533.04l-1.984.876a.801.801 0 0 1-1.123-.708l-.054-1.78a.806.806 0 0 0-.27-.569 9.49 9.49 0 0 1-3.14-7.175 9.65 9.65 0 0 1 10-9.7Z" fill="none" stroke="white" stroke-miterlimit="10" stroke-width="1.739"></path><path d="M17.79 10.132a.659.659 0 0 0-.962-.873l-2.556 2.05a.63.63 0 0 1-.758.002L11.06 9.47a1.576 1.576 0 0 0-2.277.42l-2.567 3.98a.659.659 0 0 0 .961.875l2.556-2.049a.63.63 0 0 1 .759-.002l2.452 1.84a1.576 1.576 0 0 0 2.278-.42Z" fill-rule="evenodd"></path></svg>'),
@@ -428,11 +469,11 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(
                     height: 20,
                   ),
-                   Align(
-                     alignment: Alignment.bottomLeft,
-                     child: SingleChildScrollView(
-                       scrollDirection: Axis.horizontal,
-                       child: Row(
+                  Align(
+                    alignment: Alignment.bottomLeft,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
                         children: [
                           const SizedBox(
                             width: 30,
@@ -442,18 +483,25 @@ class _HomePageState extends State<HomePage> {
                               Stack(
                                 children: [
                                   CircleAvatar(
-                                    radius:storyURL!=''? 37:35,
-                                    backgroundColor:storyURL!=''? Colors.green:Colors.black,
+                                    radius: storyURL != '' ? 37 : 35,
+                                    backgroundColor: storyURL != ''
+                                        ? Colors.green
+                                        : Colors.black,
                                     child: InkWell(
-                                      onTap: (){
-                                        if(storyURL!=''){
-                                          Navigator.push(context, MaterialPageRoute(builder: (context) =>StoryPage(
-                                            PFP: PFP,
-                                            UploadDate: uploaddate,
-                                            storylink: storyURL,
-                                            username: username,
-                                            UID: _auth.currentUser!.uid,
-                                          )));
+                                      onTap: () {
+                                        if (storyURL != '') {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      StoryPage(
+                                                        PFP: PFP,
+                                                        UploadDate: uploaddate,
+                                                        storylink: storyURL,
+                                                        username: username,
+                                                        UID: _auth
+                                                            .currentUser!.uid,
+                                                      )));
                                         }
                                       },
                                       child: CircleAvatar(
@@ -463,30 +511,39 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                     ),
                                   ),
-                                 storyURL!=null?  Positioned(
-                                      right: 2,
-                                      top: 50,
-                                      child:CircleAvatar(
-                                        backgroundColor: Colors.blue,radius: 10,
-                                        child: InkWell(
-                                          onTap: (){},
-                                          child:const Icon(Icons.add,color: Colors.white,size: 15,) ,
-                                        ),) ):Container()
+                                  storyURL != null
+                                      ? Positioned(
+                                          right: 2,
+                                          top: 50,
+                                          child: CircleAvatar(
+                                            backgroundColor: Colors.blue,
+                                            radius: 10,
+                                            child: InkWell(
+                                              onTap: () {},
+                                              child: const Icon(
+                                                Icons.add,
+                                                color: Colors.white,
+                                                size: 15,
+                                              ),
+                                            ),
+                                          ))
+                                      : Container()
                                 ],
                               ),
                               const SizedBox(
                                 height: 10,
                               ),
-                              Text('Your story',style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontSize: 12
-                              ),)
+                              Text(
+                                'Your story',
+                                style: GoogleFonts.poppins(
+                                    color: Colors.white, fontSize: 12),
+                              )
                             ],
                           ),
                           const SizedBox(
                             width: 30,
                           ),
-                          for(int i=0;i<storiesuploaderuid.length;i++)
+                          for (int i = 0; i < storiesuploaderuid.length; i++)
                             Row(
                               children: [
                                 Column(
@@ -495,36 +552,47 @@ class _HomePageState extends State<HomePage> {
                                       children: [
                                         CircleAvatar(
                                           radius: 37,
-                                          backgroundColor:Colors.green,
+                                          backgroundColor: Colors.green,
                                           child: InkWell(
-                                            onTap: (){
-
-                                              Navigator.push(context, MaterialPageRoute(builder: (context) =>StoryPage(
-                                                PFP: storiesuploadpfp[i],
-                                                UploadDate: uploaddates[i],
-                                                storylink: storiesurl[i],
-                                                username: storiesuploadname[i],
-                                                UID: storiesuploaderuid[i],
-                                              )));
-
+                                            onTap: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          StoryPage(
+                                                            PFP:
+                                                                storiesuploadpfp[
+                                                                    i],
+                                                            UploadDate:
+                                                                uploaddates[i],
+                                                            storylink:
+                                                                storiesurl[i],
+                                                            username:
+                                                                storiesuploadname[
+                                                                    i],
+                                                            UID:
+                                                                storiesuploaderuid[
+                                                                    i],
+                                                          )));
                                             },
                                             child: CircleAvatar(
                                               radius: 35,
                                               backgroundColor: Colors.white,
-                                              backgroundImage: NetworkImage(storiesuploadpfp[i]),
+                                              backgroundImage: NetworkImage(
+                                                  storiesuploadpfp[i]),
                                             ),
                                           ),
                                         ),
-
                                       ],
                                     ),
                                     const SizedBox(
                                       height: 10,
                                     ),
-                                    Text(storiesuploadname[i],style: GoogleFonts.poppins(
-                                        color: Colors.white,
-                                        fontSize: 12
-                                    ),)
+                                    Text(
+                                      storiesuploadname[i],
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.white, fontSize: 12),
+                                    )
                                   ],
                                 ),
                                 const SizedBox(
@@ -533,9 +601,9 @@ class _HomePageState extends State<HomePage> {
                               ],
                             )
                         ],
-                                         ),
-                     ),
-                   ),
+                      ),
+                    ),
+                  ),
                   const SizedBox(
                     height: 10,
                   ),
@@ -692,14 +760,15 @@ class _HomePageState extends State<HomePage> {
                                   width: 20,
                                 ),
                                 InkWell(
-                                  onTap:()async{
+                                  onTap: () async {
                                     await fetchcomment(PID[index]);
                                     showModalBottomSheet(
                                       context: context,
                                       backgroundColor: Colors.black,
                                       builder: (context) {
                                         return Container(
-                                          width: MediaQuery.of(context).size.width,
+                                          width:
+                                              MediaQuery.of(context).size.width,
                                           child: Column(
                                             children: [
                                               // Scrollable content above the TextField
@@ -708,98 +777,152 @@ class _HomePageState extends State<HomePage> {
                                                   child: Column(
                                                     children: [
                                                       // Add your content here
-                                                      for (int i = 0; i < commentid.length; i++)
+                                                      for (int i = 0;
+                                                          i < commentid.length;
+                                                          i++)
                                                         Container(
-                                                          padding: EdgeInsets.only(top: 20,bottom: 35),
-                                                          child: Column(
-                                                            children: [
-                                                              Row(
-                                                                children: [
-                                                                  const SizedBox(
-                                                                    width: 15,
-                                                                  ),
-                                                                  InkWell(
-                                                                      onTap: (){
-                                                                        _auth.currentUser!.uid==commentuid[i]?Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePage(userid: commentuid[i]),)):
-                                                                        Navigator.push(context, MaterialPageRoute(builder: (context) => OtherProfilePage(userid: commentuid[i]),));
+                                                            padding:
+                                                                EdgeInsets.only(
+                                                                    top: 20,
+                                                                    bottom: 35),
+                                                            child: Column(
+                                                              children: [
+                                                                Row(
+                                                                  children: [
+                                                                    const SizedBox(
+                                                                      width: 15,
+                                                                    ),
+                                                                    InkWell(
+                                                                      onTap:
+                                                                          () {
+                                                                        _auth.currentUser!.uid ==
+                                                                                commentuid[i]
+                                                                            ? Navigator.push(
+                                                                                context,
+                                                                                MaterialPageRoute(
+                                                                                  builder: (context) => ProfilePage(userid: commentuid[i]),
+                                                                                ))
+                                                                            : Navigator.push(
+                                                                                context,
+                                                                                MaterialPageRoute(
+                                                                                  builder: (context) => OtherProfilePage(userid: commentuid[i]),
+                                                                                ));
                                                                       },
-                                                                    child: Container(
-                                                                      height: 35,
-                                                                      width: 35,
-                                                                      decoration: const BoxDecoration(
-                                                                        color: Colors.white,
-                                                                        borderRadius: BorderRadius.all(Radius.circular(50)),
-                                                                      ),
-                                                                      child: ClipOval(
-                                                                        child: Image.network(
-                                                                          commentpfp[i],
-                                                                          height: 35,
-                                                                          width: 35,
-                                                                          fit: BoxFit.cover,
+                                                                      child:
+                                                                          Container(
+                                                                        height:
+                                                                            35,
+                                                                        width:
+                                                                            35,
+                                                                        decoration:
+                                                                            const BoxDecoration(
+                                                                          color:
+                                                                              Colors.white,
+                                                                          borderRadius:
+                                                                              BorderRadius.all(Radius.circular(50)),
+                                                                        ),
+                                                                        child:
+                                                                            ClipOval(
+                                                                          child:
+                                                                              Image.network(
+                                                                            commentpfp[i],
+                                                                            height:
+                                                                                35,
+                                                                            width:
+                                                                                35,
+                                                                            fit:
+                                                                                BoxFit.cover,
+                                                                          ),
                                                                         ),
                                                                       ),
                                                                     ),
-                                                                  ),
-                                                                  const SizedBox(
-                                                                    width: 5,
-                                                                  ),
-                                                                  InkWell(
-                                                                      onTap: (){
-                                                                        _auth.currentUser!.uid==commentuid[i]?Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePage(userid: commentuid[i]),)):
-                                                                        Navigator.push(context, MaterialPageRoute(builder: (context) => OtherProfilePage(userid: commentuid[i]),));
-                                                                      },
-                                                                    child: Column(
-                                                                      mainAxisAlignment: MainAxisAlignment.start,
-                                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                                      children: [
-                                                                        Text(commentname[i],style: GoogleFonts.poppins(
-                                                                          color: Colors.white,
-                                                                          fontSize: 15,
-                                                                          fontWeight: FontWeight.w600
-                                                                        ),),
-                                                                        const SizedBox(
-                                                                          width: 8,
-                                                                        ),
-                                                                        Row(
+                                                                    const SizedBox(
+                                                                      width: 5,
+                                                                    ),
+                                                                    InkWell(
+                                                                        onTap:
+                                                                            () {
+                                                                          _auth.currentUser!.uid == commentuid[i]
+                                                                              ? Navigator.push(
+                                                                                  context,
+                                                                                  MaterialPageRoute(
+                                                                                    builder: (context) => ProfilePage(userid: commentuid[i]),
+                                                                                  ))
+                                                                              : Navigator.push(
+                                                                                  context,
+                                                                                  MaterialPageRoute(
+                                                                                    builder: (context) => OtherProfilePage(userid: commentuid[i]),
+                                                                                  ));
+                                                                        },
+                                                                        child:
+                                                                            Column(
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.start,
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment.start,
                                                                           children: [
-                                                                            Text(commenttext[i],style: GoogleFonts.poppins(
-                                                                                color: Colors.white,
-                                                                                fontWeight: FontWeight.w300,fontSize: 15
-                                                                            ),),
+                                                                            Text(
+                                                                              commentname[i],
+                                                                              style: GoogleFonts.poppins(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
+                                                                            ),
+                                                                            const SizedBox(
+                                                                              width: 8,
+                                                                            ),
+                                                                            Row(
+                                                                              children: [
+                                                                                Text(
+                                                                                  commenttext[i],
+                                                                                  style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w300, fontSize: 15),
+                                                                                ),
+                                                                              ],
+                                                                            ),
                                                                           ],
-                                                                        ),
-                                                                      ],
-                                                                    )
-                                                                  ),
-                                                                ],
-                                                              )
-                                                            ],
-                                                          )
-                                                        ),
+                                                                        )),
+                                                                  ],
+                                                                )
+                                                              ],
+                                                            )),
                                                     ],
                                                   ),
                                                 ),
                                               ),
                                               // Fixed TextField at the bottom
                                               Container(
-                                                width: MediaQuery.of(context).size.width,
-                                                color: const Color.fromRGBO(31, 41, 55, 1),
+                                                width: MediaQuery.of(context)
+                                                    .size
+                                                    .width,
+                                                color: const Color.fromRGBO(
+                                                    31, 41, 55, 1),
                                                 child: TextField(
-                                                  controller:_commentController,
+                                                  controller:
+                                                      _commentController,
                                                   decoration: InputDecoration(
                                                     suffixIcon: InkWell(
-                                                        onTap:()async{
-                                                          if(_commentController.text.isNotEmpty){
-                                                           await writecomment(PID[index].toString());
-                                                           _commentController.clear();
-                                                           Navigator.pop(context);
+                                                        onTap: () async {
+                                                          if (_commentController
+                                                              .text
+                                                              .isNotEmpty) {
+                                                            await writecomment(
+                                                                PID[index]
+                                                                    .toString());
+                                                            _commentController
+                                                                .clear();
+                                                            Navigator.pop(
+                                                                context);
                                                           }
                                                         },
-                                                        child: const Icon(Icons.send,color: Colors.white,)),
+                                                        child: const Icon(
+                                                          Icons.send,
+                                                          color: Colors.white,
+                                                        )),
                                                     hintText: 'Comment...',
-                                                    hintStyle: GoogleFonts.poppins(color: Colors.white),
+                                                    hintStyle:
+                                                        GoogleFonts.poppins(
+                                                            color:
+                                                                Colors.white),
                                                   ),
-                                                  style: GoogleFonts.poppins(color: Colors.white),
+                                                  style: GoogleFonts.poppins(
+                                                      color: Colors.white),
                                                 ),
                                               ),
                                             ],

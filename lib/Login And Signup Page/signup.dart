@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:video_player/video_player.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:vistafeedd/HomePage/homepage.dart';
 import 'package:vistafeedd/Login%20And%20Signup%20Page/loginpage.dart';
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -99,6 +100,8 @@ class _SignupPageState extends State<SignupPage> {
       print('Unique Name ${isuniqueusername}');
     }
   }
+  String nonuniqueusername='';
+  String signuperror='';
   Future<void> signup()async{
     try{
       await checkuniqueusername();
@@ -123,8 +126,14 @@ class _SignupPageState extends State<SignupPage> {
               'UserId':_auth.currentUser!.uid,
               'Verified':false
             });
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage(),));
         setState(() {
           isloading=false;
+          nonuniqueusername='';
+        });
+      }else{
+        setState(() {
+          nonuniqueusername='This username is already taken';
         });
       }
       if (kDebugMode) {
@@ -135,6 +144,7 @@ class _SignupPageState extends State<SignupPage> {
         print('Error logging in ${e}');
         setState(() {
           isloading=false;
+          signuperror='Email ID already exists';
         });
       }
     }
@@ -290,6 +300,11 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                     ),
                   ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Center(child: Text(nonuniqueusername,style: GoogleFonts.poppins(color: Colors.red),)),
+                  Center(child: Text(signuperror,style: GoogleFonts.poppins(color: Colors.red),)),
                   const SizedBox(
                     height: 20,
                   ),

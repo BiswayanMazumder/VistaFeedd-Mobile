@@ -83,6 +83,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> with SingleTickerPr
 
   List<dynamic> PIDS = [];
   List<dynamic> PostImages = [];
+  List<dynamic> followersonly=[];
   Future<void> fetchPosts() async {
     List<dynamic> postIDList = [];
     List<dynamic> matchingPostIds =
@@ -106,6 +107,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> with SingleTickerPr
         if (postSnap.data()?['Uploaded UID'] == widget.userid) {
           matchingPostIds.add(postSnap.data()?['postid']);
           matchingPostImages.add(postSnap.data()?['Image Link']);
+          followersonly.add(postSnap.data()?['Followers Only']);
         }
       }
     }
@@ -115,7 +117,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> with SingleTickerPr
       PostImages = matchingPostImages;
     });
     if (kDebugMode) {
-      print('Matching Post IDs: $matchingPostImages');
+      print('Matching Post IDs: $followersonly');
     }
   }
   List<dynamic> RIDS = [];
@@ -640,12 +642,18 @@ class _OtherProfilePageState extends State<OtherProfilePage> with SingleTickerPr
                               UID: widget.userid,
                             ),));
                           },
-                          child: Image(
+                          child:followers.contains(_auth.currentUser!.uid)? Image(
                             image: NetworkImage(PostImages[i]),
                             height: 150,
                             width: MediaQuery.of(context).size.width / 3 - 20,  // Same as width to maintain aspect ratio
                             fit: BoxFit.cover,
-                          ),
+                          ):!followersonly[i]?Image(
+                            image: NetworkImage(PostImages[i]),
+                            height: 150,
+                            width: MediaQuery.of(context).size.width / 3 - 20,  // Same as width to maintain aspect ratio
+                            fit: BoxFit.cover,
+                          ):Container()
+                          ,
                         ),
                       );
                     }),

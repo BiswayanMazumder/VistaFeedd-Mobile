@@ -21,6 +21,7 @@ class _LoginPageState extends State<LoginPage> {
 ''';
   bool showpassword=false;
   bool isloading=false;
+  String errormessage='';
   late VideoPlayerController _controller1;
   late VideoPlayerController _controller2;
   late VideoPlayerController _controller3;
@@ -80,6 +81,7 @@ class _LoginPageState extends State<LoginPage> {
        await _auth.signInWithEmailAndPassword(email: _EmailController.text, password: _passwordController.text);
        setState(() {
          isloading=false;
+         errormessage='';
        });
        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage(),));
        if (kDebugMode) {
@@ -90,6 +92,7 @@ class _LoginPageState extends State<LoginPage> {
          print('Error logging in ${e}');
          setState(() {
            isloading=false;
+           errormessage='Please check your email address or password';
          });
        }
      }
@@ -209,6 +212,10 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(errormessage,style: GoogleFonts.poppins(color: Colors.red),),
                   const SizedBox(
                     height: 20,
                   ),

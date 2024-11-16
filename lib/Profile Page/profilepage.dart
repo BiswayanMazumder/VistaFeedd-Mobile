@@ -7,12 +7,15 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vistafeedd/HomePage/homepage.dart';
 import 'package:video_player/video_player.dart';
+import 'package:vistafeedd/Login%20And%20Signup%20Page/loginpage.dart';
 import 'package:vistafeedd/Post%20Details%20Page/postdetails.dart';
 import 'package:vistafeedd/Profile%20Page%20Details/followerspage.dart';
 import 'package:vistafeedd/Profile%20Page%20Details/followingpage.dart';
 import 'package:vistafeedd/Reels%20Section%20Page/reelviewingpage.dart';
 import 'package:vistafeedd/Search%20Page/searchandexploresection.dart';
+import 'package:vistafeedd/Story%20Page/Create_Story.dart';
 import 'package:vistafeedd/Story%20Page/stories.dart';
+import 'package:vistafeedd/Upload%20Post/CreatePost.dart';
 class ProfilePage extends StatefulWidget {
   final String userid;
   ProfilePage({required this.userid});
@@ -193,7 +196,9 @@ class _ProfilePageState extends State<ProfilePage> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               InkWell(
-                onTap: (){},
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => CreateStory(),));
+                },
                 child: SizedBox(
                   height: 22,
                   width: 22,
@@ -204,11 +209,19 @@ class _ProfilePageState extends State<ProfilePage> {
                 width: 20,
               ),
               InkWell(
-                onTap: (){},
-                child: SizedBox(
+                onTap: ()async{
+                  await _auth.signOut();
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage(),));
+                },
+                child: const SizedBox(
                   height: 22,
                   width: 22,
-                  child: SvgPicture.string('<svg aria-label="Settings" class="x1lliihq x1n2onr6 x5n08af" fill="white" height="24" role="img" viewBox="0 0 24 24" width="24"><title>Settings</title><line fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="3" x2="21" y1="4" y2="4"></line><line fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="3" x2="21" y1="12" y2="12"></line><line fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="3" x2="21" y1="20" y2="20"></line></svg>'),
+                  child: Icon(Icons.login,color: Colors.red,)
+                  // SvgPicture.string('<svg aria-label="Settings" class="x1lliihq x1n2onr6 x5n08af" fill="white" height="24" '
+                  //     'role="img" viewBox="0 0 24 24" width="24"><title>Settings</title><line fill="none" stroke="white" stroke-linecap="round" '
+                  //     'stroke-linejoin="round" stroke-width="2" x1="3" x2="21" y1="4" y2="4"></line><line fill="none" stroke="white" stroke-linecap="round" '
+                  //     'stroke-linejoin="round" stroke-width="2" x1="3" x2="21" y1="12" y2="12"></line><line fill="none" stroke="white" stroke-linecap="round" '
+                  //     'stroke-linejoin="round" stroke-width="2" x1="3" x2="21" y1="20" y2="20"></line></svg>'),
                 ),
               ),
               const SizedBox(
