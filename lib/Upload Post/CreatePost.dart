@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'dart:io';
+
+import 'package:vistafeedd/Upload%20Post/Create_post_details.dart';
 
 class CreatePost extends StatefulWidget {
   const CreatePost({Key? key}) : super(key: key);
@@ -72,13 +75,16 @@ class _CreatePostState extends State<CreatePost> {
           Row(
             children: [
               InkWell(
-                onTap: (){},
-                child: const Text(
-                  'Proceed',
-                  style: TextStyle(
-                    color: Colors.white,
-                    // color: Color.fromRGBO(0, 149, 246, 1),
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => Post_Details_Create(imageFile: _selectedImage!),));
+                },
+                child: Text(
+                  'Next',
+                  style: GoogleFonts.poppins(
+                    // color: Colors.white,
+                    color: const Color.fromRGBO(0, 149, 246, 1),
                     fontWeight: FontWeight.bold,
+                    fontSize: 15
                   ),
                 ),
               ),
@@ -88,21 +94,20 @@ class _CreatePostState extends State<CreatePost> {
             ],
           )
         ],
-        title: const Text(
+        title:  Text(
           'New Post',
-          style: TextStyle(
+          style: GoogleFonts.poppins(
             color: Colors.white,
             // color: Color.fromRGBO(0, 149, 246, 1),
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),
       backgroundColor: Colors.black,
       body: Column(
         children: [
-          // Fixed container for the selected image
           Container(
-            height: MediaQuery.sizeOf(context).height/2,
+            height: MediaQuery.sizeOf(context).height/1.5,
             width: double.infinity,
             decoration: BoxDecoration(
               color: Colors.grey,
