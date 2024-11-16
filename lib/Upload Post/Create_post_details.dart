@@ -114,7 +114,7 @@ class _Post_Details_CreateState extends State<Post_Details_Create> {
         'Image Link': imageLink,
         'Upload Date': FieldValue.serverTimestamp(),
         'Uploaded UID': _auth.currentUser!.uid,
-        'postid': numbers,
+        'postid': numbers.toString(),
         'Followers Only': _isfollower,
       });
       Navigator.pushReplacement(
