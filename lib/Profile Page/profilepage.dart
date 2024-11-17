@@ -11,6 +11,7 @@ import 'package:vistafeedd/Login%20And%20Signup%20Page/loginpage.dart';
 import 'package:vistafeedd/Post%20Details%20Page/postdetails.dart';
 import 'package:vistafeedd/Profile%20Page%20Details/followerspage.dart';
 import 'package:vistafeedd/Profile%20Page%20Details/followingpage.dart';
+import 'package:vistafeedd/Profile%20Page/Edit_Profile.dart';
 import 'package:vistafeedd/Reels%20Section%20Page/reelviewingpage.dart';
 import 'package:vistafeedd/Search%20Page/searchandexploresection.dart';
 import 'package:vistafeedd/Story%20Page/Create_Story.dart';
@@ -484,16 +485,21 @@ class _ProfilePageState extends State<ProfilePage> {
                 // const SizedBox(
                 //   width: 30,
                 // ),
-                Container(
-                  height: 35,
-                  width: MediaQuery.sizeOf(context).width / 2.5,
-                  decoration: const BoxDecoration(
-                      color: Color.fromRGBO(54, 54, 54, 7),
-                      borderRadius: BorderRadius.all(Radius.circular(10))),
-                  child: Center(
-                    child: Text(
-                      'Edit Profile',
-                      style: GoogleFonts.poppins(color: Colors.white),
+                InkWell(
+                  onTap: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => Edit_Profile(),));
+                  },
+                  child: Container(
+                    height: 35,
+                    width: MediaQuery.sizeOf(context).width / 2.5,
+                    decoration: const BoxDecoration(
+                        color: Color.fromRGBO(54, 54, 54, 7),
+                        borderRadius: BorderRadius.all(Radius.circular(10))),
+                    child: Center(
+                      child: Text(
+                        'Edit Profile',
+                        style: GoogleFonts.poppins(color: Colors.white),
+                      ),
                     ),
                   ),
                 ),
