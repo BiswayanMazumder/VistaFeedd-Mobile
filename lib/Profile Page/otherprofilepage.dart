@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:vistafeedd/HomePage/homepage.dart';
 import 'package:video_player/video_player.dart';
 import 'package:vistafeedd/Post%20Details%20Page/postdetails.dart';
@@ -30,6 +31,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> with SingleTickerPr
   String bio = '';
   bool isprivate = false;
   bool isverified = false;
+  String Link='';
   Future<void> fetchpfp() async {
     final docsnap = await _firestore
         .collection('User Details')
@@ -41,6 +43,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> with SingleTickerPr
         usernames = docsnap.data()?['Name'];
         bio = docsnap.data()?['Bio'];
         isprivate = docsnap.data()?['Private Account'];
+        Link=docsnap.data()?['Link'];
         isverified = docsnap.data()?['Verified'];
       });
     }
@@ -428,6 +431,33 @@ class _OtherProfilePageState extends State<OtherProfilePage> with SingleTickerPr
             const SizedBox(
               height: 15,
             ),
+           Link!=''? Column(
+              children: [
+                Row(
+                  children: [
+                    const SizedBox(
+                      width: 30,
+                    ),
+                    const Icon(Icons.link,color: Colors.white,),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    InkWell(
+                      onTap:()async{
+                        await launchUrl(Uri.parse('https://$Link'));
+                      },
+                      child: Text(
+                        Link,
+                        style: GoogleFonts.poppins(color: Colors.white,fontWeight: FontWeight.w600),
+                      ),
+                    )
+                  ],
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+              ],
+            ):Container(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [

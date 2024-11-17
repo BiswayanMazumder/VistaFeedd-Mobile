@@ -16,6 +16,7 @@ import 'package:vistafeedd/Reels%20Section%20Page/reelviewingpage.dart';
 import 'package:vistafeedd/Search%20Page/searchandexploresection.dart';
 import 'package:vistafeedd/Story%20Page/Create_Story.dart';
 import 'package:vistafeedd/Story%20Page/stories.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:vistafeedd/Upload%20Post/CreatePost.dart';
 class ProfilePage extends StatefulWidget {
   final String userid;
@@ -34,6 +35,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String bio = '';
   bool isprivate = false;
   bool isverified = false;
+  String Link='';
   Future<void> fetchpfp() async {
     final docsnap = await _firestore
         .collection('User Details')
@@ -44,6 +46,7 @@ class _ProfilePageState extends State<ProfilePage> {
         pfp = docsnap.data()?['Profile Pic'];
         usernames = docsnap.data()?['Name'];
         bio = docsnap.data()?['Bio'];
+        Link=docsnap.data()?['Link'];
         isprivate = docsnap.data()?['Private Account'];
         isverified = docsnap.data()?['Verified'];
       });
@@ -473,6 +476,29 @@ class _ProfilePageState extends State<ProfilePage> {
                 Text(
                   bio,
                   style: GoogleFonts.poppins(color: Colors.white),
+                )
+              ],
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              children: [
+                const SizedBox(
+                  width: 30,
+                ),
+               Link!=''? const Icon(Icons.link,color: Colors.white,):Container(),
+                const SizedBox(
+                  width: 10,
+                ),
+                InkWell(
+                  onTap:()async{
+                    await launchUrl(Uri.parse('https://$Link'));
+                  },
+                  child: Text(
+                    Link,
+                    style: GoogleFonts.poppins(color: Colors.white,fontWeight: FontWeight.w600),
+                  ),
                 )
               ],
             ),
