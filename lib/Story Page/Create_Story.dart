@@ -134,7 +134,9 @@ class _CreateStoryState extends State<CreateStory> {
             children: [
               InkWell(
                 onTap: uploadstory,
-                child:_isloading?CircularProgressIndicator(color: const Color.fromRGBO(0, 149, 246, 1),) : Text(
+                child:_isloading?const CircularProgressIndicator(color: Color.fromRGBO(0, 149, 246, 1),)
+                    :
+                Text(
                   'Next',
                   style: GoogleFonts.poppins(
                     // color: Colors.white,
