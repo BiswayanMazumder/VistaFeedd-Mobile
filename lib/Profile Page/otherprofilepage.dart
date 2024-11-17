@@ -11,6 +11,7 @@ import 'package:video_player/video_player.dart';
 import 'package:vistafeedd/Post%20Details%20Page/postdetails.dart';
 import 'package:vistafeedd/Profile%20Page%20Details/followerspage.dart';
 import 'package:vistafeedd/Profile%20Page%20Details/followingpage.dart';
+import 'package:vistafeedd/Profile%20Page/Profile_Card.dart';
 import 'package:vistafeedd/Reels%20Section%20Page/reelviewingpage.dart';
 import 'package:vistafeedd/Story%20Page/stories.dart';
 class OtherProfilePage extends StatefulWidget {
@@ -260,6 +261,22 @@ class _OtherProfilePageState extends State<OtherProfilePage> with SingleTickerPr
             )
           ],
         ),
+        actions: [
+          Row(
+            children: [
+              InkWell(
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileCard(name: usernames, pfp: pfp, bio: bio),));
+                },
+                child: SvgPicture.string('<svg aria-label="Share" class="x1lliihq x1n2onr6 xyb1xck" fill="white" height="24" role="img" viewBox="0 0 24 24" width="24"><title>Share</title><line fill="none" stroke="white" stroke-linejoin="round" stroke-width="2" x1="22" x2="9.218" y1="3" y2="10.083"></line><polygon fill="none" points="11.698 20.334 22 3.001 2 3.001 9.218 10.084 11.698 20.334" stroke="white" stroke-linejoin="round" stroke-width="2"></polygon></svg>'),
+                  
+              ),
+               const SizedBox(
+                width: 10,
+              ),
+            ],
+          )
+           ],
       ),
       backgroundColor: Colors.black,
       body: SingleChildScrollView(

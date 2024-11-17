@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,6 +14,7 @@ import 'package:vistafeedd/Post%20Details%20Page/postdetails.dart';
 import 'package:vistafeedd/Profile%20Page%20Details/followerspage.dart';
 import 'package:vistafeedd/Profile%20Page%20Details/followingpage.dart';
 import 'package:vistafeedd/Profile%20Page/Edit_Profile.dart';
+import 'package:vistafeedd/Profile%20Page/Profile_Card.dart';
 import 'package:vistafeedd/Reels%20Section%20Page/reelviewingpage.dart';
 import 'package:vistafeedd/Search%20Page/searchandexploresection.dart';
 import 'package:vistafeedd/Story%20Page/Create_Story.dart';
@@ -176,6 +179,8 @@ class _ProfilePageState extends State<ProfilePage> {
       uploaddate = timestamp?.toDate();
     }
   }
+  bool _isTapped = false;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -529,16 +534,22 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
                 ),
-                Container(
-                  height: 35,
-                  width: MediaQuery.sizeOf(context).width / 2.5,
-                  decoration: const BoxDecoration(
-                      color: Color.fromRGBO(54, 54, 54, 7),
-                      borderRadius: BorderRadius.all(Radius.circular(10))),
-                  child: Center(
-                    child: Text(
-                      'Share Profile',
-                      style: GoogleFonts.poppins(color: Colors.white),
+
+                InkWell(
+                  onTap:(){
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileCard(name: usernames, pfp: pfp,bio: bio),));
+                  },
+                  child: Container(
+                    height: 35,
+                    width: MediaQuery.sizeOf(context).width / 2.5,
+                    decoration: const BoxDecoration(
+                        color: Color.fromRGBO(54, 54, 54, 7),
+                        borderRadius: BorderRadius.all(Radius.circular(10))),
+                    child: Center(
+                      child: Text(
+                        'Share Profile',
+                        style: GoogleFonts.poppins(color: Colors.white),
+                      ),
                     ),
                   ),
                 ),
@@ -732,9 +743,41 @@ class _ProfilePageState extends State<ProfilePage> {
                 ):Container()
                 ,
               ],
-            )
-
-
+            ),
+            // if(_isTapped)  // When tapped, show the blur and text overlay
+            //   Positioned.fill(
+            //     child: BackdropFilter(
+            //       filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+            //       child: Padding(
+            //           padding: const EdgeInsets.all(20.0), // Adjust padding as needed
+            //           child: Column(
+            //             mainAxisAlignment: MainAxisAlignment.start, // Align text to the top
+            //             crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
+            //             children: [
+            //               Text(
+            //                 'Share your profile with others!',
+            //                 style: GoogleFonts.poppins(
+            //                   color: Colors.white,
+            //                   fontSize: 24,
+            //                   fontWeight: FontWeight.bold,
+            //                 ),
+            //               ),
+            //               const SizedBox(height: 20),
+            //               ElevatedButton(
+            //                 onPressed: () {
+            //                   setState(() {
+            //                     _isTapped = false; // Hide the overlay
+            //                   });
+            //                   // Add further logic to share the profile here
+            //                 },
+            //                 child: Text('Close'),
+            //               ),
+            //             ],
+            //           ),
+            //         ),
+            //
+            //     ),
+            //   ),
           ],
         ),
       ),
