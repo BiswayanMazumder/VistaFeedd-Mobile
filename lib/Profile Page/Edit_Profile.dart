@@ -63,9 +63,9 @@ class _Edit_ProfileState extends State<Edit_Profile> {
         pfp = docsnap.data()?['Profile Pic'];
         usernames = docsnap.data()?['Name'];
         bio = docsnap.data()?['Bio'];
-        isprivate = docsnap.data()?['Private Account'];
-        isverified = docsnap.data()?['Verified'];
-        Link = docsnap.data()?['Link'];
+        isprivate = docsnap.data()?['Private Account']??false;
+        isverified = docsnap.data()?['Verified']??false;
+        Link = docsnap.data()?['Link']??'';
       });
     }
     if (kDebugMode) {
