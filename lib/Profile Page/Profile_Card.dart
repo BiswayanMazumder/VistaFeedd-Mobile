@@ -9,6 +9,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:ui' as ui;
@@ -165,6 +166,7 @@ class _ProfileCardState extends State<ProfileCard> with TickerProviderStateMixin
     'Email',
     'X'
   ];
+  bool isswiping=false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -239,100 +241,164 @@ class _ProfileCardState extends State<ProfileCard> with TickerProviderStateMixin
               angle: _rotationAnimation.value, // Rotate the whole container
               child: RepaintBoundary(
                 key: _containerKey, // Key for capturing the widget
-                child: Container(
-                  height: MediaQuery.sizeOf(context).height / 1.5,
-                  width: MediaQuery.sizeOf(context).width * 0.8,
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.red,
-                        Colors.blue,
-                        Colors.purple,
-                        Colors.orange,
-                        Colors.yellow,
-                        Colors.orangeAccent,
-                        Colors.purpleAccent,
-                        Colors.blueAccent,
-                        Colors.blueGrey,
-                      ],
-                      tileMode: TileMode.clamp,
-                      begin: Alignment.topLeft, // Starting point of the gradient
-                      end: Alignment.bottomRight,
+                child: GestureDetector(
+                  onHorizontalDragUpdate:(_) {
+                    setState(() {
+                      isswiping=!isswiping;
+                    });
+                    print('Is swiping 1 $isswiping');
+                  },
+                  onHorizontalDragEnd: (_) {
+                    
+                    print('Is swiping 2 $isswiping');
+                  },
+                  child: Container(
+                    height: MediaQuery.sizeOf(context).height / 1.5,
+                    width: MediaQuery.sizeOf(context).width * 0.8,
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.red,
+                          Colors.blue,
+                          Colors.purple,
+                          Colors.orange,
+                          Colors.yellow,
+                          Colors.orangeAccent,
+                          Colors.purpleAccent,
+                          Colors.blueAccent,
+                          Colors.blueGrey,
+                        ],
+                        tileMode: TileMode.clamp,
+                        begin: Alignment.topLeft, // Starting point of the gradient
+                        end: Alignment.bottomRight,
+                      ),
                     ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Center(
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            // CircleAvatar with the profile image
-                            CircleAvatar(
-                              radius: 100,
-                              backgroundImage: NetworkImage(widget.pfp),
-                            ),
+                    child:!isswiping? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Center(
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              // CircleAvatar with the profile image
+                              CircleAvatar(
+                                radius: 100,
+                                backgroundImage: NetworkImage(widget.pfp),
+                              ),
 
-                            // Rotated container with name, positioned at the bottom of the avatar
-                            Positioned(
-                              bottom: 0,
-                              child: Transform.rotate(
-                                angle: -0.15, // Adjust the angle to tilt it
-                                child: Container(
-                                  height: 40,
-                                  decoration: const BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                                  ),
-                                  child: Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(left: 10, right: 10),
-                                      child: Text(
-                                        widget.name,
-                                        style: GoogleFonts.poppins(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 15,
+                              // Rotated container with name, positioned at the bottom of the avatar
+                              Positioned(
+                                bottom: 0,
+                                child: Transform.rotate(
+                                  angle: -0.15, // Adjust the angle to tilt it
+                                  child: Container(
+                                    height: 40,
+                                    decoration: const BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                                    ),
+                                    child: Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(left: 10, right: 10),
+                                        child: Text(
+                                          widget.name,
+                                          style: GoogleFonts.poppins(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 15,
+                                          ),
+                                          textAlign: TextAlign.center,
                                         ),
-                                        textAlign: TextAlign.center,
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      // Show name and bio after rotation
-                      if (_isDetailsVisible)
-                        Column(
-                          children: [
-                            Text(
-                              widget.name,
-                              style: GoogleFonts.alegreya(
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        // Show name and bio after rotation
+                        if (_isDetailsVisible)
+                          Column(
+                            children: [
+                              Text(
+                                widget.name,
+                                style: GoogleFonts.alegreya(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Text(
+                                widget.bio,
+                                style: GoogleFonts.poppins(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 18),
+                              ),
+                            ],
+                          ),
+                      ],
+                    ):Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Transform.rotate(
+                            angle: -0.15,
+                            child: SizedBox(
+                              height: MediaQuery.sizeOf(context).height/4.5,
+                              width: MediaQuery.sizeOf(context).height/4.5,
+                              child:  PrettyQrView.data(
+                                  data: 'https://vistafeedd.vercel.app/others/${_auth.currentUser!.uid}',
+                                  decoration: const PrettyQrDecoration(
+                                    shape: PrettyQrRoundedSymbol(
+                                      color: Colors.purple,
+                                      borderRadius: BorderRadius.all(Radius.circular(20))
+                                    ),
+                                    image: PrettyQrDecorationImage(
+                                      image: NetworkImage('https://firebasestorage.googleapis.com/v0/b/vistafeedd'
+                                          '.appspot.com/o/Assets%2Fpngtree-meta-ball-icon-vector-design-template-png-image_53567'
+                                          '33.png?alt=media&token=d09b9c69-11b4-4538-8066-bd4b53d37019',),
+                                    ),
+                                  ),
+                            )
+                            ),
+                          ),
+                        const SizedBox(
+                          height: 35,
+                        ),
+                        Transform.rotate(angle: 0.15,
+                        child:Container(
+                          height: 40,
+                          decoration: const BoxDecoration(
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                          ),
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 10, right: 10),
+                              child: Text(
+                                '@${widget.name}',
+                                style: GoogleFonts.poppins(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 20),
+                                  fontSize: 20,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
                             ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Text(
-                              widget.bio,
-                              style: GoogleFonts.poppins(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 18),
-                            ),
-                          ],
+                          ),
                         ),
-                    ],
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),
