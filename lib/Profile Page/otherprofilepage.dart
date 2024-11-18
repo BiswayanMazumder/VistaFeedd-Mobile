@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:vistafeedd/Chat%20Page/chats.dart';
 import 'package:vistafeedd/HomePage/homepage.dart';
 import 'package:video_player/video_player.dart';
 import 'package:vistafeedd/Post%20Details%20Page/postdetails.dart';
@@ -178,6 +179,30 @@ class _OtherProfilePageState extends State<OtherProfilePage> with SingleTickerPr
     }
     print('Viewers $storyviewers');
   }
+  List<dynamic> ChatUIDS=[];
+  List<dynamic> ChatIDS=[];
+  String reqchatid='';
+  Future<void>fetchchats()async{
+    final docsnap=await _firestore.collection('Chat UIDs').doc(widget.userid).get();
+    if(docsnap.exists){
+      setState(() {
+        ChatIDS=docsnap.data()?['IDs'];
+        ChatUIDS=docsnap.data()?['UIDs'];
+      });
+    }
+    if (kDebugMode) {
+      print('Chat ID $ChatIDS');
+    }
+    if (kDebugMode) {
+      print('Chat UIDS ${ChatUIDS.indexOf(_auth.currentUser!.uid)}');
+    }
+    setState(() {
+      reqchatid=ChatIDS[ChatUIDS.indexOf(_auth.currentUser!.uid)].toString();
+    });
+    if (kDebugMode) {
+      print('CHAT ID REQ $reqchatid');
+    }
+  }
   @override
   void initState() {
     // TODO: implement initState
@@ -187,6 +212,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> with SingleTickerPr
     fetchfollower();
     fetchPosts();
     fetchReels();
+    fetchchats();
     fetchstories();
     _controller = AnimationController(
       vsync: this,
@@ -525,16 +551,23 @@ class _OtherProfilePageState extends State<OtherProfilePage> with SingleTickerPr
                     ),
                   ),
                 ),
-                Container(
-                  height: 35,
-                  width: MediaQuery.sizeOf(context).width / 2.5,
-                  decoration: const BoxDecoration(
-                      color: Color.fromRGBO(54, 54, 54, 7),
-                      borderRadius: BorderRadius.all(Radius.circular(10))),
-                  child: Center(
-                    child: Text(
-                      'Message',
-                      style: GoogleFonts.poppins(color: Colors.white),
+                InkWell(
+                  onTap: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => Chats(PFP: pfp,
+                        username: usernames,
+                        ChatID: reqchatid),));
+                  },
+                  child: Container(
+                    height: 35,
+                    width: MediaQuery.sizeOf(context).width / 2.5,
+                    decoration: const BoxDecoration(
+                        color: Color.fromRGBO(54, 54, 54, 7),
+                        borderRadius: BorderRadius.all(Radius.circular(10))),
+                    child: Center(
+                      child: Text(
+                        'Message',
+                        style: GoogleFonts.poppins(color: Colors.white),
+                      ),
                     ),
                   ),
                 ),
