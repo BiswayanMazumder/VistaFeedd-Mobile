@@ -24,13 +24,21 @@ class _SearchResultState extends State<SearchResult> {
   List<dynamic> UIDS = [];
   List<dynamic> Name = [];
   List<dynamic> PFP = [];
-
+  bool _isloading=false;
   @override
   void initState() {
     super.initState();
-    fetchrecentsearches();
+    fetchdata();
   }
-
+  Future<void>fetchdata()async{
+    setState(() {
+      _isloading=true;
+    });
+    await fetchrecentsearches();
+    setState(() {
+      _isloading=false;
+    });
+  }
   // Search function to get results from Firestore
   void _search() async {
     String query = _searchController.text.trim();
@@ -130,7 +138,9 @@ class _SearchResultState extends State<SearchResult> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
+      body:_isloading?const Center(
+        child: CircularProgressIndicator(color: CupertinoColors.white,),
+      ):SingleChildScrollView(
         child: Column(
           children: [
             const SizedBox(height: 35),
@@ -185,7 +195,25 @@ class _SearchResultState extends State<SearchResult> {
                         Text(
                           Name[j],
                           style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600),
-                        )
+                        ),
+                        const Spacer(),
+                        InkWell(
+                          onTap: ()async{
+                            await _firestore.collection('Recent Searches').doc(_auth.currentUser!.uid).set({
+                              'UIDS':FieldValue.arrayRemove([UIDS[j]])
+                            },SetOptions(merge: true));
+                            setState(() {
+                              UIDS.removeAt(j);
+                            });
+                            if (kDebugMode) {
+                              print(UIDS[j]);
+                            }
+                          },
+                          child: const Icon(Icons.cancel_outlined,color: CupertinoColors.white,),
+                        ),
+                        const SizedBox(
+                          width: 20,
+                        ),
                       ],
                     ),
                   ),

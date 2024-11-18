@@ -53,6 +53,9 @@ class _SearchAndExplorePageState extends State<SearchAndExplorePage> {
   }
   bool _isLoading=false;
   Future<void> fetchdata() async {
+    setState(() {
+      _isLoading = true;
+    });
     await fetchposts();
     // await fetchdata();
     await fetchpfp();

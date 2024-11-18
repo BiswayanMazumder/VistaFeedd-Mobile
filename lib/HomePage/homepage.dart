@@ -228,6 +228,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> fetchdata() async {
+    setState(() {
+      _isLoading = true;
+    });
     await fetchpostuserdetails();
     await fetchfollowing();
     await fetchpfp();

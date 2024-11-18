@@ -64,6 +64,11 @@ class _ProfileCardState extends State<ProfileCard> with TickerProviderStateMixin
   // Function to capture the container as PNG and share it
   Future<void> _captureAndShareImage() async {
     try {
+      if(isswiping){
+        setState(() {
+          isswiping=false;
+        });
+      }
       RenderRepaintBoundary boundary =
       _containerKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
       ui.Image image = await boundary.toImage(pixelRatio: 3.0);
