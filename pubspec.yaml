@@ -52,6 +52,8 @@ dependencies:
   firebase_storage: ^11.6.9
   url_launcher: ^6.3.0
   share_plus: ^7.2.2
+  widgets_to_image: ^1.0.0
+  path_provider: ^2.1.4
 dev_dependencies:
   flutter_test:
     sdk: flutter
