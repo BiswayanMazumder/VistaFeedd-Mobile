@@ -117,13 +117,13 @@ class _ProfileCardState extends State<ProfileCard> with TickerProviderStateMixin
                                 ),
                                 child: Center(
                                   child: Padding(
-                                    padding: const EdgeInsets.only(left: 20, right: 20),
+                                    padding: const EdgeInsets.only(left: 10, right: 10),
                                     child: Text(
                                       widget.name,
                                       style: GoogleFonts.poppins(
                                         color: Colors.black,
                                         fontWeight: FontWeight.w500,
-                                        fontSize: 20,
+                                        fontSize: 15,
                                       ),
                                       textAlign: TextAlign.center,
                                     ),
