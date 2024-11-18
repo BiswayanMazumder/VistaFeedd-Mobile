@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -45,8 +47,8 @@ class _OtherProfilePageState extends State<OtherProfilePage> with SingleTickerPr
         usernames = docsnap.data()?['Name'];
         bio = docsnap.data()?['Bio'];
         isprivate = docsnap.data()?['Private Account'];
-        Link=docsnap.data()?['Link'];
-        isverified = docsnap.data()?['Verified'];
+        Link=docsnap.data()?['Link']??'';
+        isverified = docsnap.data()?['Verified']??false;
       });
     }
     if (kDebugMode) {
@@ -196,12 +198,43 @@ class _OtherProfilePageState extends State<OtherProfilePage> with SingleTickerPr
     if (kDebugMode) {
       print('Chat UIDS ${ChatUIDS.indexOf(_auth.currentUser!.uid)}');
     }
-    setState(() {
-      reqchatid=ChatIDS[ChatUIDS.indexOf(_auth.currentUser!.uid)].toString();
-    });
+    if(ChatUIDS.contains(_auth.currentUser!.uid)){
+      setState(() {
+        reqchatid=ChatIDS[ChatUIDS.indexOf(_auth.currentUser!.uid)].toString();
+      });
+    }else if(ChatUIDS.isEmpty){
+      await generatePostID();
+      setState(() {
+        reqchatid=randomFiveDigitNumber.toString();
+      });
+    }else{
+      await generatePostID();
+      setState(() {
+        reqchatid=randomFiveDigitNumber.toString();
+      });
+    }
     if (kDebugMode) {
       print('CHAT ID REQ $reqchatid');
     }
+  }
+  int randomFiveDigitNumber = 0;
+  Future<void> generatePostID() async {
+    final random = Random();
+    randomFiveDigitNumber =
+        10000 + random.nextInt(90000); // Generates 5-digit number
+    if (kDebugMode) {
+      print('Random 5-digit number: $randomFiveDigitNumber');
+    }
+    await _firestore.collection('Chat UIDs').doc(_auth.currentUser!.uid).set(
+        {
+          'IDs':FieldValue.arrayUnion([randomFiveDigitNumber]),
+          'UIDs':FieldValue.arrayUnion([widget.userid])
+        },SetOptions(merge: true));
+    await _firestore.collection('Chat UIDs').doc(widget.userid).set(
+        {
+          'IDs':FieldValue.arrayUnion([randomFiveDigitNumber]),
+          'UIDs':FieldValue.arrayUnion([_auth.currentUser!.uid])
+        },SetOptions(merge: true));
   }
   @override
   void initState() {
