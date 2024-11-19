@@ -4,7 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'dart:async'; // Importing the async library for Timer
+import 'dart:async';
+
+import 'package:vistafeedd/Calling%20Page/voice_call.dart'; // Importing the async library for Timer
 
 class Chats extends StatefulWidget {
   final String ChatID;
@@ -28,7 +30,10 @@ class _ChatsState extends State<Chats> {
   List<dynamic> messages = [];
   List<DateTime?> messagetimes = [];
   List<dynamic> messagesender = [];
+  List<dynamic> messagesendercopy = [];
+  List<dynamic> messagesendercopyset = [];
   bool _isLoading = true;
+  String requids='';
   Timer? _timer; // Timer to fetch messages every second
   ScrollController _scrollController = ScrollController(); // Controller for scrolling
 
@@ -43,6 +48,7 @@ class _ChatsState extends State<Chats> {
       messages.clear();
       messagetimes.clear();
       messagesender.clear();
+      messagesendercopy.clear();
 
       for (var doc in docsnap.docs) {
         var message = doc.data()?['message'];
@@ -75,6 +81,7 @@ class _ChatsState extends State<Chats> {
         messages = sortedMessages;
         messagetimes = sortedTimes;
         messagesender = sortedSenders;
+        messagesendercopy=messagesender;
       });
 
       // Scroll to the bottom when messages are fetched
@@ -83,6 +90,17 @@ class _ChatsState extends State<Chats> {
       if (kDebugMode) {
         print('Error fetching messages: $e');
       }
+    }
+    setState(() {
+      messagesendercopyset={...messagesendercopy}.toList();
+    });
+    for(int i=0;i<messagesendercopyset.length;i++){
+      if(messagesendercopyset[i]==_auth.currentUser!.uid){
+        messagesendercopyset.removeAt(i);
+      }
+    }
+    if (kDebugMode) {
+      print('Messenger ${messagesender}');
     }
   }
 
@@ -103,6 +121,7 @@ class _ChatsState extends State<Chats> {
             .add({
           'message': message,
           'seen': false,
+          // 'recieverID':widget.
           'senderId': _auth.currentUser!.uid,
           'timestamp': FieldValue.serverTimestamp(),
         });
@@ -150,6 +169,21 @@ class _ChatsState extends State<Chats> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+        // actions: [
+        //   Row(
+        //     children: [
+        //       InkWell(
+        //         onTap: (){
+        //           _timer?.cancel();  // Stop the periodic timer
+        //           Navigator.push(context, MaterialPageRoute(builder: (context) => Voice_Call_Interface(PFP: widget.PFP,
+        //               username:widget.username,
+        //              )));
+        //         },
+        //         child: const Icon(Icons.call,color: CupertinoColors.white,),
+        //       )
+        //     ],
+        //   )
+        // ],
         backgroundColor: Colors.black,
         leading: InkWell(
           onTap: () {

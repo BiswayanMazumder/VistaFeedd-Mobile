@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:vistafeedd/Calling%20Page/voice_call.dart';
 import 'package:vistafeedd/Chat%20Page/chats.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -222,6 +223,17 @@ class _ChatScreenState extends State<ChatScreen> {
                                         style: GoogleFonts.poppins(
                                             color: CupertinoColors.white),
                                       ),
+                                    ),
+                                    const Spacer(),
+                                    InkWell(
+                                      onTap: (){
+                                        // _timer?.cancel();  // Stop the periodic timer
+                                        Navigator.push(context, MaterialPageRoute(builder: (context) => Voice_Call_Interface(PFP: ChatPFPS[index],
+                                          username:ChatNames[index],
+                                          UID: ChatUIDS[index],
+                                        )));
+                                      },
+                                      child: const Icon(Icons.call,color: CupertinoColors.white,),
                                     )
                                   ],
                                 ),

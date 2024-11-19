@@ -55,6 +55,9 @@ dependencies:
   widgets_to_image: ^1.0.0
   path_provider: ^2.1.4
   pretty_qr_code: ^3.3.0
+  flutter_webrtc: ^0.9.48+hotfix.1
+  flutter_sound: ^9.2.13
+  wave: ^0.2.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
