@@ -215,7 +215,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                                 builder: (context) => Chats(
                                                     PFP: ChatPFPS[index],
                                                     username: ChatNames[index],
-                                                    ChatID: ChatIDS[index])));
+                                                    ChatID: ChatIDS[index].toString())));
                                       },
                                       child: Text(
                                         ChatNames[index],
