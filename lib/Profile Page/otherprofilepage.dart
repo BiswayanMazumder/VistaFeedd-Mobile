@@ -587,6 +587,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> with SingleTickerPr
                 InkWell(
                   onTap: (){
                     Navigator.push(context, MaterialPageRoute(builder: (context) => Chats(PFP: pfp,
+                        UID: widget.userid,
                         username: usernames,
                         ChatID: reqchatid),));
                   },

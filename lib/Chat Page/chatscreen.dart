@@ -214,6 +214,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                             context,
                                             MaterialPageRoute(
                                                 builder: (context) => Chats(
+                                                  UID: ChatUIDS[index],
                                                     PFP: ChatPFPS[index],
                                                     username: ChatNames[index],
                                                     ChatID: ChatIDS[index].toString())));
