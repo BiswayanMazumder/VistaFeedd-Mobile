@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vistafeedd/Profile%20Page/otherprofilepage.dart';
@@ -9,10 +10,12 @@ import 'package:vistafeedd/Profile%20Page/profilepage.dart';
 class ChatsCustomise extends StatefulWidget {
   final String UID;
   final String username;
+  final String ChatID;
   final String PFP;
 
   ChatsCustomise({
     required this.PFP,
+    required this.ChatID,
     required this.username,
     required this.UID,
   });
@@ -37,7 +40,23 @@ class _ChatsCustomiseState extends State<ChatsCustomise> {
   ];
 
   int? selectedIndex; // To keep track of the selected theme index
-
+  String chatthemeid='';
+  Future<void>fetchchattheme()async{
+    final docsnap=await _firestore.collection('Chat Themes').doc(widget.ChatID).get();
+    if(docsnap.exists){
+     if (kDebugMode) {
+       setState(() {
+         selectedIndex=themelinks.indexOf(docsnap.data()?['Image URL']);
+       });
+     }
+    }
+  }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    fetchchattheme();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -132,7 +151,7 @@ class _ChatsCustomiseState extends State<ChatsCustomise> {
                 bool isSelected = selectedIndex == index; // Check if this theme is selected
                 return GestureDetector(
                   onTap: () async{
-                    await _firestore.collection('Chat Themes').doc(_auth.currentUser!.uid).set(
+                    await _firestore.collection('Chat Themes').doc(widget.ChatID).set(
                         {
                           'Image URL':themelinks[index]
                         });

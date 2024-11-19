@@ -155,7 +155,7 @@ class _ChatsState extends State<Chats> {
   }
   String chatthemeid='';
   Future<void>fetchchattheme()async{
-    final docsnap=await _firestore.collection('Chat Themes').doc(_auth.currentUser!.uid).get();
+    final docsnap=await _firestore.collection('Chat Themes').doc(widget.ChatID).get();
     if(docsnap.exists){
       setState(() {
         chatthemeid=docsnap.data()?['Image URL'];
@@ -214,6 +214,7 @@ class _ChatsState extends State<Chats> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => ChatsCustomise(
+                      ChatID: widget.ChatID,
                       PFP: widget.PFP,
                       username: widget.username,
                       UID: widget.UID,
