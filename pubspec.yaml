@@ -57,7 +57,9 @@ dependencies:
   pretty_qr_code: ^3.3.0
   flutter_webrtc: ^0.9.48+hotfix.1
   flutter_sound: ^9.2.13
+  onesignal_flutter: ^5.1.2
   wave: ^0.2.2
+  http: ^1.2.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

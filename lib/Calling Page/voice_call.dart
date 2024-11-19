@@ -1,9 +1,13 @@
 import 'dart:ui';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:vistafeedd/HomePage/homepage.dart';
-
+import 'package:vistafeedd/Environmental%20Files/.env.dart';
 class Voice_Call_Interface extends StatefulWidget {
   final String UID;
   final String username;
@@ -21,15 +25,43 @@ class Voice_Call_Interface extends StatefulWidget {
 
 class _Voice_Call_InterfaceState extends State<Voice_Call_Interface> {
   bool _isMuted = false;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   RTCPeerConnection? _peerConnection;
   MediaStream? _localStream;
-
+  String pfp = '';
+  // late VideoPlayerController _controller1;
+  String usernames = '';
+  Future<void> fetchpfp() async {
+    final docsnap = await _firestore
+        .collection('User Details')
+        .doc(_auth.currentUser!.uid)
+        .get();
+    if (docsnap.exists) {
+      setState(() {
+        pfp = docsnap.data()?['Profile Pic'];
+        usernames = docsnap.data()?['Name'];
+      });
+    }
+    if (kDebugMode) {
+      // print('Verified $isverified');
+    }
+  }
   @override
   void initState() {
     super.initState();
     _initWebRTC();
+    _initonesignal();
+    fetchpfp();
   }
+  Future<void> _initonesignal()async{
+    OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
 
+    OneSignal.initialize(Environment.oneSignalApiKey);
+
+// The promptForPushNotificationsWithUserResponse function will show the iOS or Android push notification prompt. We recommend removing the following code and instead using an In-App Message to prompt for notification permission
+    OneSignal.Notifications.requestPermission(true);
+  }
   @override
   void dispose() {
     _localStream?.dispose();

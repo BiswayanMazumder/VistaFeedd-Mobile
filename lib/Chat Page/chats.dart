@@ -105,7 +105,7 @@ class _ChatsState extends State<Chats> {
   }
 
   void startFetchingMessages() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
+    _timer = Timer.periodic(const Duration(hours: 2), (Timer t) {
       fetchmessages();
     });
   }
