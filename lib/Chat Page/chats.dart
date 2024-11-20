@@ -1,5 +1,8 @@
+import 'dart:async';
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,12 +10,9 @@ import 'package:flutter_sound/public/flutter_sound_player.dart';
 import 'package:flutter_sound/public/flutter_sound_recorder.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:path_provider/path_provider.dart';
-import 'dart:async';
-import 'package:speech_to_text/speech_to_text.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:vistafeedd/Calling%20Page/voice_call.dart';
-import 'package:vistafeedd/Chat%20Page/Chat_customise.dart'; // Importing the async library for Timer
 import 'package:audio_waveforms/audio_waveforms.dart';
+import 'package:vistafeedd/Chat%20Page/Chat_customise.dart';
+
 class Chats extends StatefulWidget {
   final String ChatID;
   final String username;
@@ -23,7 +23,7 @@ class Chats extends StatefulWidget {
     required this.PFP,
     required this.username,
     required this.ChatID,
-    required this.UID
+    required this.UID,
   });
 
   @override
@@ -33,158 +33,85 @@ class Chats extends StatefulWidget {
 class _ChatsState extends State<Chats> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final TextEditingController _messageController = TextEditingController(); // Controller for TextField
-  List<dynamic> messages = [];
+  final TextEditingController _messageController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
+  List<dynamic> messages = [];
   List<DateTime?> messagetimes = [];
   List<dynamic> messagesender = [];
-  List<dynamic> messagesendercopy = [];
-  List<dynamic> messagesendercopyset = [];
   List<dynamic> audioLinks = [];
-  bool _isLoading = true;
-  String requids='';
-  bool _islistening=false;
-  Timer? _timer; // Timer to fetch messages every second
-  ScrollController _scrollController = ScrollController(); // Controller for scrolling
-  late SpeechToText _speech;
-  late AudioPlayer _audioPlayer;
+  bool _isListening = false;
+  Timer? _timer;
+  String chatthemeid = '';
+  String? _audioFilePath;
+  late FlutterSoundRecorder _recorder;
+  late FlutterSoundPlayer _player;
+  @override
+  void initState() {
+    super.initState();
+    fetchmessages();
+    fetchchattheme();
+    _initializeRecorder();
+    startFetchingMessages();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _messageController.dispose();
+    _scrollController.dispose();
+    _recorder.closeRecorder();
+    _player.closePlayer();
+    super.dispose();
+  }
+
   Future<void> fetchmessages() async {
     try {
       final docsnap = await FirebaseFirestore.instance
           .collection('Chats')
           .doc(widget.ChatID)
           .collection('Messages')
+          .orderBy('timestamp')
           .get();
 
-      // Clear previous data
       messages.clear();
       messagetimes.clear();
       messagesender.clear();
-      messagesendercopy.clear();
-      audioLinks.clear();  // Initialize the audioLinks list
+      audioLinks.clear();
 
       for (var doc in docsnap.docs) {
-        var message = doc.data()?['message'];
-        var sender = doc.data()?['senderId'];
-        var timestamp = doc.data()?['timestamp'];
-        var audioLink = doc.data()?['AudioLink'];  // Fetch the audio link
+        var message = doc['message'] ?? '';
+        var sender = doc['senderId'] ?? '';
+        var timestamp = doc['timestamp'];
+        var audioLink = doc['AudioLink'] ?? '';
 
-        // Add timestamp to list, handling null values
+        messages.add(message);
+        messagesender.add(sender);
+        audioLinks.add(audioLink);
+
         if (timestamp is Timestamp) {
           messagetimes.add(timestamp.toDate());
         } else {
           messagetimes.add(null);
         }
-
-        // Add sender and message to their respective lists
-        messagesender.add(sender);
-        messages.add(message);
-
-        // Add audioLink to the list
-        audioLinks.add(audioLink); // Add the audio link to the list
       }
 
-      // Generate indices based on messages length and sort by timestamp
-      List<int> indices = List.generate(messages.length, (index) => index);
-      indices.sort((a, b) => messagetimes[a]?.compareTo(messagetimes[b] ?? DateTime(0)) ?? 0);
+      setState(() {});
+      _scrollToBottom();
+    } catch (e) {
+      print('Error fetching messages: $e');
+    }
+  }
 
-      // Create lists for sorted data
-      List<dynamic> sortedMessages = [];
-      List<DateTime?> sortedTimes = [];
-      List<dynamic> sortedSenders = [];
-      List<dynamic> sortedAudioLinks = [];  // List for sorted audio links
-
-      // Populate sorted lists
-      for (var index in indices) {
-        sortedMessages.add(messages[index]);
-        sortedTimes.add(messagetimes[index]);
-        sortedSenders.add(messagesender[index]);
-        sortedAudioLinks.add(audioLinks[index]);  // Add the audio link in the sorted order
-      }
-
-      // Update state with the sorted data
+  Future<void> fetchchattheme() async {
+    final docsnap = await _firestore.collection('Chat Themes').doc(widget.ChatID).get();
+    if (docsnap.exists) {
       setState(() {
-        messages = sortedMessages;
-        messagetimes = sortedTimes;
-        messagesender = sortedSenders;
-        audioLinks = sortedAudioLinks;  // Set the sorted audio links
+        chatthemeid = docsnap['Image URL'];
       });
-
-      print('Audio Links: $audioLinks'); // Optional debug print to check the audio links
-      _scrollToBottom();  // Scroll to the bottom when messages are fetched
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error fetching messages: $e');
-      }
-    }
-
-    setState(() {
-      // Filter out the current user's ID from the sender list
-      messagesendercopyset = {...messagesendercopy}.toList();
-    });
-
-    for (int i = 0; i < messagesendercopyset.length; i++) {
-      if (messagesendercopyset[i] == _auth.currentUser!.uid) {
-        messagesendercopyset.removeAt(i);
-      }
-    }
-
-    if (kDebugMode) {
-      if (messagesendercopyset.length == 0) {
-        print('Messenger ${messagesender}');
-      } else {
-        print('Messenger ${messagesendercopyset}');
-      }
     }
   }
 
-  late FlutterSoundRecorder _recorder;
-  late FlutterSoundPlayer _player;
-  Future<void> _initializeRecorder() async {
-    await _recorder.openRecorder();
-    await _player.openPlayer();
-  }
-  String? _audioFilePath;
-  void startFetchingMessages() {
-    _timer = Timer.periodic(const Duration(hours: 2), (Timer t) {
-      fetchmessages();
-      fetchchattheme();
-    });
-  }
-  Future<void> _startRecording() async {
-    try {
-      final tempDir = await getTemporaryDirectory();
-      _audioFilePath = '${tempDir.path}/voice_recording.aac'; // Temporary file path
-
-      await _recorder.startRecorder(toFile: _audioFilePath);
-      print("Recording started...");
-    } catch (e) {
-      print('Error starting recording: $e');
-    }
-  }
-
-  // Stop recording and play audio
-  Future<void> _stopRecording() async {
-    try {
-      // Stop recording
-      await _recorder.stopRecorder();
-      if (kDebugMode) {
-        print("Recording stopped. File saved to $_audioFilePath");
-      }
-
-      if (_audioFilePath != null) {
-        // Play the recorded audio file
-        await _player.startPlayer(fromURI: _audioFilePath);
-        if (kDebugMode) {
-          print("Playing recorded audio...");
-        }
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error stopping recording or playing audio: $e');
-      }
-    }
-  }
   Future<void> sendMessage() async {
     String message = _messageController.text.trim();
     if (message.isNotEmpty) {
@@ -195,22 +122,18 @@ class _ChatsState extends State<Chats> {
             .collection('Messages')
             .add({
           'message': message,
-          'seen': false,
-          // 'recieverID':widget.
+          'AudioLink': '',
           'senderId': _auth.currentUser!.uid,
           'timestamp': FieldValue.serverTimestamp(),
         });
-        _messageController.clear(); // Clear the text field after sending
-        fetchmessages(); // Refresh messages
+        _messageController.clear();
+        fetchmessages();
       } catch (e) {
-        if (kDebugMode) {
-          print('Error sending message: $e');
-        }
+        print('Error sending message: $e');
       }
     }
   }
 
-  // Function to scroll to the bottom
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
@@ -220,39 +143,56 @@ class _ChatsState extends State<Chats> {
       );
     }
   }
-  String chatthemeid='';
-  Future<void>fetchchattheme()async{
-    final docsnap=await _firestore.collection('Chat Themes').doc(widget.ChatID).get();
-    if(docsnap.exists){
-      setState(() {
-        chatthemeid=docsnap.data()?['Image URL'];
-      });
-    }
-    if (kDebugMode) {
-      print(chatthemeid);
-    }
-  }
-  @override
-  void initState() {
-    super.initState();
-    fetchmessages();
-    startFetchingMessages();
-    fetchchattheme();
+
+  Future<void> _initializeRecorder() async {
     _recorder = FlutterSoundRecorder();
     _player = FlutterSoundPlayer();
-    _initializeRecorder();
-    // _waveforms = AudioWaveforms;
+    await _recorder.openRecorder();
+    await _player.openPlayer();
   }
 
-  @override
-  void dispose() {
-    _timer?.cancel();
-    if (kDebugMode) {
-      print('Disposed');
+  Future<String?> _uploadAudioToFirebase(String filePath) async {
+    try {
+      final fileName = 'audio_${DateTime.now().millisecondsSinceEpoch}.aac';
+      final ref = FirebaseStorage.instance.ref().child('audioMessages/$fileName');
+      final uploadTask = await ref.putFile(File(filePath));
+      final downloadUrl = await uploadTask.ref.getDownloadURL();
+      return downloadUrl;
+    } catch (e) {
+      print('Error uploading audio: $e');
+      return null;
     }
-    _messageController.dispose(); // Dispose the controller
-    _scrollController.dispose(); // Dispose the ScrollController
-    super.dispose();
+  }
+
+  Future<void> _stopRecordingAndUpload() async {
+    try {
+      await _recorder.stopRecorder();
+      if (_audioFilePath != null) {
+        final downloadUrl = await _uploadAudioToFirebase(_audioFilePath!);
+        if (downloadUrl != null) {
+          await _firestore
+              .collection('Chats')
+              .doc(widget.ChatID)
+              .collection('Messages')
+              .add({
+            'message': '',
+            'AudioLink': downloadUrl,
+            'senderId': _auth.currentUser!.uid,
+            'timestamp': FieldValue.serverTimestamp(),
+          });
+          fetchmessages();
+        }
+      }
+    } catch (e) {
+      print('Error stopping recording or uploading audio: $e');
+    }
+  }
+
+  void startFetchingMessages() {
+    _timer = Timer.periodic(const Duration(seconds: 2), (_) {
+      fetchmessages();
+      fetchchattheme();
+    });
   }
 
   @override
@@ -262,180 +202,112 @@ class _ChatsState extends State<Chats> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         leading: InkWell(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: const Icon(
-            CupertinoIcons.back,
-            color: Colors.white,
-          ),
+          onTap: () => Navigator.pop(context),
+          child: const Icon(CupertinoIcons.back, color: Colors.white),
         ),
         title: Row(
           children: [
-            CircleAvatar(
-              radius: 20,
-              backgroundImage: NetworkImage(widget.PFP),
-            ),
-            const SizedBox(
-              width: 10,
-            ),
+            CircleAvatar(radius: 20, backgroundImage: NetworkImage(widget.PFP)),
+            const SizedBox(width: 10),
             InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ChatsCustomise(
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => ChatsCustomise(PFP: widget.PFP,
                       ChatID: widget.ChatID,
-                      PFP: widget.PFP,
                       username: widget.username,
-                      UID: widget.UID,
-                    ),
-                  ),
-                );
-              },
-              child: Text(
-                widget.username,
-                style: GoogleFonts.poppins(
-                    color: CupertinoColors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500),
-              ),
-            ),
+                      UID: widget.UID),));
+                },
+                child: Text(widget.username, style: GoogleFonts.poppins(color: Colors.white,fontWeight: FontWeight.w400,fontSize: 18))),
           ],
         ),
       ),
       body: Stack(
         children: [
-          // Background Image if chatthemeid is not empty
           if (chatthemeid.isNotEmpty)
             Positioned.fill(
-              child: Image.network(
-                chatthemeid,
-                fit: BoxFit.cover,
-              ),
+              child: Image.network(chatthemeid, fit: BoxFit.cover),
             ),
-          // Chat content
           Column(
             children: [
-              const SizedBox(
-                height: 50,
-              ),
               Expanded(
-                child: SingleChildScrollView(
-                  controller: _scrollController, // Attach the ScrollController here
-                  child: Column(
-                    children: [
-                      for (int i = 0; i < messages.length; i++)
-                        Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  bottom: 50, left: 20, right: 20),
-                              child: Row(
-                                mainAxisAlignment: messagesender[i] ==
-                                    _auth.currentUser!.uid
-                                    ? MainAxisAlignment.end
-                                    : MainAxisAlignment.start,
-                                children: [
-                                  messagesender[i] != _auth.currentUser!.uid
-                                      ? CircleAvatar(
-                                    radius: 20,
-                                    backgroundImage:
-                                    NetworkImage(widget.PFP),
-                                  )
-                                      : Container(),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Container(
-                                    height: 50,
-                                    decoration: BoxDecoration(
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(50)),
-                                      color: messagesender[i] ==
-                                          _auth.currentUser!.uid
-                                          ? Colors.blue
-                                          : const Color.fromRGBO(33, 33, 33, 1),
-                                    ),
-                                    child: Padding(
-                                      padding:
-                                      const EdgeInsets.only(left: 10, right: 10),
-                                      child: Center(
-                                        child: Text(
-                                          messages[i],
-                                          style: GoogleFonts.poppins(
-                                              color: CupertinoColors.white),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                    ],
-                  ),
+                child: ListView.builder(
+                  controller: _scrollController,
+                  itemCount: messages.length,
+                  itemBuilder: (context, i) {
+                    bool isSender = messagesender[i] == _auth.currentUser!.uid;
+                    return Row(
+                      mainAxisAlignment:
+                      isSender ? MainAxisAlignment.end : MainAxisAlignment.start,
+                      children: [
+                        if (!isSender)
+                          CircleAvatar(radius: 20, backgroundImage: NetworkImage(widget.PFP)),
+                        if (messages[i].isNotEmpty)
+                          Container(
+                            margin: const EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.all(10.0),
+                            decoration: BoxDecoration(
+                              color: isSender ? Colors.blue : Colors.grey[800],
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            child: Text(
+                              messages[i],
+                              style: GoogleFonts.poppins(color: Colors.white),
+                            ),
+                          ),
+                        if (audioLinks[i] != null && audioLinks[i].isNotEmpty)
+                          Container(
+                            margin: const EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.all(2.0),
+                            decoration: BoxDecoration(
+                              color: isSender ? Colors.blue : Colors.grey[800],
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            child: IconButton(
+                              icon: const Icon( CupertinoIcons.play_circle, color: Colors.white),
+                              onPressed: () async {
+                                await _player.startPlayer(fromURI: audioLinks[i]);
+                              },
+                            ),
+                          ),
+                      ],
+                    );
+                  },
                 ),
               ),
               Container(
-                width: MediaQuery.of(context).size.width,
-                color:_islistening?Colors.purple: const Color.fromRGBO(31, 41, 55, 1),
+                color: _isListening ? Colors.purple : Colors.grey[900],
+                padding: const EdgeInsets.all(8.0),
                 child: Row(
                   children: [
                     Expanded(
-                      child:_islistening?Container(
-                        height: 50,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text('Listening...',style: GoogleFonts.poppins(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w600
-                            ),),
-                          ],
-                        ),
-                        //show waveform here
-                      ): TextField(
+                      child: _isListening
+                          ? Text('Listening...', style: GoogleFonts.poppins(color: Colors.white))
+                          : TextField(
                         controller: _messageController,
                         decoration: InputDecoration(
                           hintText: 'Type a message...',
-                          hintStyle: GoogleFonts.poppins(
-                              color: CupertinoColors.white,
-                              fontWeight: FontWeight.w400,
-                              fontSize: 15),
+                          hintStyle: GoogleFonts.poppins(color: Colors.white),
                         ),
-                        style: GoogleFonts.poppins(color: CupertinoColors.white),
+                        style: GoogleFonts.poppins(color: Colors.white),
                       ),
                     ),
-                    Row(
-                      children: [
-                        GestureDetector(
-                          onLongPress: (){
-                            setState(() {
-                              _islistening=true;
-                            });
-                            print('Listening $_islistening');
-                            _startRecording();
-                          },
-                          onLongPressEnd: (details) {
-                            setState(() {
-                              _islistening=false;
-                            });
-                            print('Listening $_islistening');
-                            _stopRecording();
-                          },
-                          child:const Icon(CupertinoIcons.mic,color: CupertinoColors.white,),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                       _islistening?Container():IconButton(
-                          icon: const Icon(Icons.send, color: Colors.white),
-                          onPressed: sendMessage, // Call sendMessage when pressed
-                        ),
-                      ],
+                    GestureDetector(
+                      onLongPress: () async {
+                        setState(() => _isListening = true);
+                        final tempDir = await getTemporaryDirectory();
+                        _audioFilePath = '${tempDir.path}/voice_recording.aac';
+                        await _recorder.startRecorder(toFile: _audioFilePath);
+                      },
+                      onLongPressUp: () async {
+                        setState(() => _isListening = false);
+                        await _stopRecordingAndUpload();
+                      },
+                      child: Icon(CupertinoIcons.mic, color: Colors.white),
                     ),
+                    if (!_isListening)
+                      IconButton(
+                        icon: const Icon(Icons.send, color: Colors.white),
+                        onPressed: sendMessage,
+                      ),
                   ],
                 ),
               ),
