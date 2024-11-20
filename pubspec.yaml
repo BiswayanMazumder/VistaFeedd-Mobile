@@ -60,6 +60,9 @@ dependencies:
   onesignal_flutter: ^5.1.2
   wave: ^0.2.2
   http: ^1.2.0
+  speech_to_text: ^6.6.0
+  audioplayers: ^5.2.1
+  audio_waveforms: ^1.1.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
