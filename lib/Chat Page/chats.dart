@@ -11,6 +11,7 @@ import 'package:flutter_sound/public/flutter_sound_recorder.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:audio_waveforms/audio_waveforms.dart';
+import 'package:vistafeedd/Calling%20Page/voice_call.dart';
 import 'package:vistafeedd/Chat%20Page/Chat_customise.dart';
 
 class Chats extends StatefulWidget {
@@ -226,6 +227,27 @@ class _ChatsState extends State<Chats> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+        actions: [
+          isblocked
+              ? Container()
+              : InkWell(
+                  onTap: () {
+                    // _timer?.cancel();  // Stop the periodic timer
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => Voice_Call_Interface(
+                                  PFP: widget.PFP,
+                                  username: widget.username,
+                                  UID: widget.UID,
+                                )));
+                  },
+                  child: const Icon(
+                    Icons.call,
+                    color: CupertinoColors.white,
+                  ),
+                )
+        ],
         backgroundColor: Colors.black,
         leading: InkWell(
           onTap: () => Navigator.pop(context),

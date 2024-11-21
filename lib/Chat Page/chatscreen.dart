@@ -225,17 +225,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                             color: CupertinoColors.white),
                                       ),
                                     ),
-                                    const Spacer(),
-                                    InkWell(
-                                      onTap: (){
-                                        // _timer?.cancel();  // Stop the periodic timer
-                                        Navigator.push(context, MaterialPageRoute(builder: (context) => Voice_Call_Interface(PFP: ChatPFPS[index],
-                                          username:ChatNames[index],
-                                          UID: ChatUIDS[index],
-                                        )));
-                                      },
-                                      child: const Icon(Icons.call,color: CupertinoColors.white,),
-                                    )
+
                                   ],
                                 ),
                               ) // Your Row widget content
