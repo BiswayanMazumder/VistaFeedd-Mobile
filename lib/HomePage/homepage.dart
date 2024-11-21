@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -226,7 +227,24 @@ class _HomePageState extends State<HomePage> {
       }
     }
   }
+  Future<void> fetchdevicedetails() async {
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
 
+    // For Android devices, use AndroidDeviceInfo
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      if (kDebugMode) {
+        // Print the device model in debug mode
+        print('Running on ${androidInfo.model}');
+      }
+    } else {
+      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      // Handle other platforms if necessary (iOS or others)
+      if (kDebugMode) {
+        print('Running on ${iosInfo.utsname.machine}');
+        // print('Not running on Android device');
+      }
+    }}
   Future<void> fetchdata() async {
     setState(() {
       _isLoading = true;
@@ -328,6 +346,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     fetchdata();
+    fetchdevicedetails();
   }
 
   @override

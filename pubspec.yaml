@@ -63,6 +63,7 @@ dependencies:
   speech_to_text: ^6.6.0
   audioplayers: ^5.2.1
   audio_waveforms: ^1.1.1
+  device_info_plus: ^9.1.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
