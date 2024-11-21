@@ -5,6 +5,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:vistafeedd/Chat%20Page/chatscreen.dart';
@@ -14,7 +15,7 @@ import 'package:vistafeedd/Search%20Page/searchandexploresection.dart';
 import 'package:vistafeedd/Story%20Page/stories.dart';
 import 'package:vistafeedd/Upload%20Post/CreatePost.dart';
 import 'package:zoom_pinch_overlay/zoom_pinch_overlay.dart';
-
+import 'package:geocoding/geocoding.dart';
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -227,24 +228,90 @@ class _HomePageState extends State<HomePage> {
       }
     }
   }
+  String _devicename='';
   Future<void> fetchdevicedetails() async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
 
     // For Android devices, use AndroidDeviceInfo
     if (defaultTargetPlatform == TargetPlatform.android) {
       AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      setState(() {
+        _devicename=androidInfo.device;
+      });
       if (kDebugMode) {
         // Print the device model in debug mode
-        print('Running on ${androidInfo.model}');
+        print('Running on ${androidInfo.device}');
       }
-    } else {
+    } else if(defaultTargetPlatform==TargetPlatform.iOS){
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      setState(() {
+        _devicename=iosInfo.utsname.sysname;
+      });
       // Handle other platforms if necessary (iOS or others)
       if (kDebugMode) {
-        print('Running on ${iosInfo.utsname.machine}');
+        print('Running on ${iosInfo.utsname.sysname}');
         // print('Not running on Android device');
       }
     }}
+  String _areaName = 'Fetching...';
+  String _countryName='Fetching...';
+  Future<void> _getAreaName() async {
+    try {
+      // Request location permission
+      LocationPermission permission = await Geolocator.requestPermission();
+
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        setState(() {
+          _areaName = 'Location permission denied';
+        });
+        return;
+      }
+
+      // Get the current position
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      // Reverse geocoding to get the area name
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+      if (kDebugMode) {
+        print('Current Position: ${position.latitude}, ${position.longitude}');
+      }
+
+      if (placemarks.isNotEmpty) {
+        setState(() {
+          _areaName = placemarks[0].locality ?? 'Area name not available';
+          _countryName=placemarks[0].country??'Country name not avaliable';
+        });
+      } else {
+        setState(() {
+          _areaName = 'Could not fetch area name';
+          _countryName='Couldnot fetch';
+        });
+      }
+      if (kDebugMode) {
+        print('Area $_areaName , $_countryName');
+      }
+    } catch (e) {
+      setState(() {
+        _areaName = 'Error occurred area name: $e';
+      });
+    }
+  }
+  int randomFiveDigitNumber = 0;
+  Future<void> generatePostID() async {
+    final random = Random();
+    randomFiveDigitNumber =
+        10000 + random.nextInt(90000); // Generates 5-digit number
+    if (kDebugMode) {
+      print('Random 5-digit number: $randomFiveDigitNumber');
+    }
+  }
+
   Future<void> fetchdata() async {
     setState(() {
       _isLoading = true;
@@ -346,6 +413,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     fetchdata();
+    _getAreaName();
     fetchdevicedetails();
   }
 
