@@ -37,6 +37,16 @@ class _ChatsCustomiseState extends State<ChatsCustomise> {
     'https://i.pinimg.com/736x/72/e2/f7/72e2f7b816570213865d91e6ac76a52a.jpg',
     'https://i.pinimg.com/736x/47/df/70/47df7011c42db722fa74b05272e373fc.jpg',
     'https://i.pinimg.com/736x/9a/c9/20/9ac9207a9bfe17c95c21c030ae953577.jpg',
+    'https://iphoneswallpapers.com/wp-content/uploads/2024/11/Crystal-Stones-Wallpaper-169x300.jpg',
+    'https://i.pinimg.com/736x/6c/2b/7e/6c2b7e96b8a5a71e47cad1df27050f90.jpg',
+    'https://i.pinimg.com/736x/99/59/e4/9959e43d530dbe348b6722ad6c9e0954.jpg',
+    'https://i.pinimg.com/736x/a9/d0/3d/a9d03d957aaacb9bf4f103246b6b4428.jpg',
+    'https://i.pinimg.com/736x/cf/ab/0f/cfab0f49779fd7df1e80b3a950ceed9c.jpg',
+    'https://i.pinimg.com/736x/6a/95/d9/6a95d9b5cd282395cbfc33c2b3107377.jpg',
+    'https://i.pinimg.com/736x/04/a4/ed/04a4ed0dde358c275520481c68a660a0.jpg',
+    'https://i.pinimg.com/736x/3d/8c/2f/3d8c2f2c82c1c9ef1e27be645cd1aa17.jpg',
+    'https://i.pinimg.com/736x/1d/dd/b6/1dddb6039e0c0066a9e5b83f94f96347.jpg',
+    'https://i.pinimg.com/736x/73/60/00/736000652e67a6b7aad1ca5b11e042ff.jpg'
   ];
 
   int? selectedIndex; // To keep track of the selected theme index

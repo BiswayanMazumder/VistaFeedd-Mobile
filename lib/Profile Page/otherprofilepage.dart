@@ -217,6 +217,24 @@ class _OtherProfilePageState extends State<OtherProfilePage> with SingleTickerPr
       print('CHAT ID REQ $reqchatid');
     }
   }
+  List<dynamic> blockedusers=[];
+  Future<void>fetchblockedusers()async{
+    final docsnap=await _firestore.collection('Blocked Users').doc(widget.userid).get();
+    if(docsnap.exists){
+      setState(() {
+        blockedusers=docsnap.data()?['Blocked UIDs'];
+      });
+    }
+    if(blockedusers.contains(_auth.currentUser!.uid)){
+      setState(() {
+        isblocked=true;
+      });
+    }else{
+      setState(() {
+        isblocked=false;
+      });
+    }
+  }
   int randomFiveDigitNumber = 0;
   Future<void> generatePostID() async {
     final random = Random();
@@ -245,6 +263,7 @@ class _OtherProfilePageState extends State<OtherProfilePage> with SingleTickerPr
     fetchfollower();
     fetchPosts();
     fetchReels();
+    fetchblockedusers();
     fetchchats();
     fetchstories();
     _controller = AnimationController(
@@ -287,6 +306,8 @@ class _OtherProfilePageState extends State<OtherProfilePage> with SingleTickerPr
       });
     }
   }
+  bool isblocked=false;
+  bool isrestricted=false;
   bool ispostsecttion=true;
   bool isreelsection=false;
   bool istaggedsection=false;
@@ -331,7 +352,86 @@ class _OtherProfilePageState extends State<OtherProfilePage> with SingleTickerPr
                   
               ),
                const SizedBox(
-                width: 10,
+                width: 20,
+              ),
+              InkWell(
+                onTap: (){
+                  showDialog(context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          backgroundColor: Colors.black,
+                          title: Column(
+                            mainAxisAlignment:MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              InkWell(
+                                onTap: () async {
+                                  setState(() {
+                                    isblocked = !isblocked; // Toggle the isblocked state before database call
+                                  });
+
+                                  if (isblocked) {
+                                    // Add user to blocked list
+                                    await _firestore.collection('Blocked Users').doc(_auth.currentUser!.uid).set(
+                                      {
+                                        'Blocked UIDs': FieldValue.arrayUnion([widget.userid])
+                                      },
+                                      SetOptions(merge: true),
+                                    );
+                                    await _firestore.collection('Blocked Users').doc(widget.userid).set(
+                                      {
+                                        'Blocked UIDs': FieldValue.arrayUnion([_auth.currentUser!.uid])
+                                      },
+                                      SetOptions(merge: true),
+                                    );
+                                  } else {
+                                    // Remove user from blocked list
+                                    await _firestore.collection('Blocked Users').doc(_auth.currentUser!.uid).set(
+                                      {
+                                        'Blocked UIDs': FieldValue.arrayRemove([widget.userid])
+                                      },
+                                      SetOptions(merge: true),
+                                    );
+                                    await _firestore.collection('Blocked Users').doc(widget.userid).set(
+                                      {
+                                        'Blocked UIDs': FieldValue.arrayRemove([_auth.currentUser!.uid])
+                                      },
+                                      SetOptions(merge: true),
+                                    );
+                                  }
+
+                                  Navigator.pop(context);
+                                  if (kDebugMode) {
+                                    print('Block $isblocked');
+                                  }
+                                },
+                                child: Text(isblocked?'Unblock':'Block',style: GoogleFonts.poppins(
+                                    color:isblocked?Colors.green: Colors.red,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600
+                                ),),
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              InkWell(
+                                onTap: (){},
+                                child: Text('Restrict',style: GoogleFonts.poppins(
+                                    color: Colors.red,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600
+                                ),),
+                              )
+                            ],
+                          ),
+                        );
+                      },);
+                },
+                child: SvgPicture.string('<svg aria-label="Settings" class="x1lliihq x1n2onr6 x5n08af" fill="white" height="24" role="img" viewBox="0 0 24 24" width="24"><title>Settings</title><line fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="3" x2="21" y1="4" y2="4"></line><line fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="3" x2="21" y1="12" y2="12"></line><line fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="3" x2="21" y1="20" y2="20"></line></svg>'),
+
+              ),
+              const SizedBox(
+                width: 20,
               ),
             ],
           )
@@ -568,23 +668,26 @@ class _OtherProfilePageState extends State<OtherProfilePage> with SingleTickerPr
                       });
                     }
                   },
-                  child: Container(
-                    height: 35,
-                    width: MediaQuery.sizeOf(context).width / 2.5,
-                    decoration:  BoxDecoration(
-                        color:!followers.contains(_auth.currentUser!.uid)?Color.fromRGBO(0, 149, 246, 7): Color.fromRGBO(54, 54, 54, 7),
-                        borderRadius: BorderRadius.all(Radius.circular(10))),
-                    child: Center(
-                      child: Text( //b follows a but a doesnot follow b
-                        //following - me but followers not me followback
-                        followers.contains(_auth.currentUser!.uid)?'Following':following.contains(_auth.currentUser!.uid)&&!followers.contains(_auth.currentUser!.uid)?
-                        'Follow Back':'Follow',
-                        style: GoogleFonts.poppins(color: Colors.white),
+                  child: Padding(
+                    padding:  EdgeInsets.only(left: isblocked?20:0,right: isblocked?20:0),
+                    child: Container(
+                      height: 35,
+                      width:isblocked?MediaQuery.sizeOf(context).width-40: MediaQuery.sizeOf(context).width / 2.5,
+                      decoration:  BoxDecoration(
+                          color:!followers.contains(_auth.currentUser!.uid)?Color.fromRGBO(0, 149, 246, 7): Color.fromRGBO(54, 54, 54, 7),
+                          borderRadius: BorderRadius.all(Radius.circular(10))),
+                      child: Center(
+                        child: Text( //b follows a but a doesnot follow b
+                          //following - me but followers not me followback
+                          followers.contains(_auth.currentUser!.uid)?'Following':following.contains(_auth.currentUser!.uid)&&!followers.contains(_auth.currentUser!.uid)?
+                          'Follow Back':'Follow',
+                          style: GoogleFonts.poppins(color: Colors.white),
+                        ),
                       ),
                     ),
                   ),
                 ),
-                InkWell(
+               isblocked?Container(): InkWell(
                   onTap: (){
                     Navigator.push(context, MaterialPageRoute(builder: (context) => Chats(PFP: pfp,
                         UID: widget.userid,

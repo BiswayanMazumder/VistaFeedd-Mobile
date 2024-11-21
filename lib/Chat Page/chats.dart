@@ -46,6 +46,28 @@ class _ChatsState extends State<Chats> {
   String? _audioFilePath;
   late FlutterSoundRecorder _recorder;
   late FlutterSoundPlayer _player;
+  List<dynamic> blockedusers = [];
+  bool isblocked = false;
+  Future<void> fetchblockedusers() async {
+    final docsnap =
+        await _firestore.collection('Blocked Users').doc(widget.UID).get();
+    if (docsnap.exists) {
+      setState(() {
+        blockedusers = docsnap.data()?['Blocked UIDs'];
+      });
+    }
+    if (blockedusers.contains(_auth.currentUser!.uid)) {
+      setState(() {
+        isblocked = true;
+      });
+    } else {
+      setState(() {
+        isblocked = false;
+      });
+    }
+    print('Is blocked $isblocked');
+  }
+
   @override
   void initState() {
     super.initState();
@@ -53,6 +75,7 @@ class _ChatsState extends State<Chats> {
     fetchchattheme();
     _initializeRecorder();
     startFetchingMessages();
+    fetchblockedusers();
   }
 
   @override
@@ -104,7 +127,8 @@ class _ChatsState extends State<Chats> {
   }
 
   Future<void> fetchchattheme() async {
-    final docsnap = await _firestore.collection('Chat Themes').doc(widget.ChatID).get();
+    final docsnap =
+        await _firestore.collection('Chat Themes').doc(widget.ChatID).get();
     if (docsnap.exists) {
       setState(() {
         chatthemeid = docsnap['Image URL'];
@@ -154,7 +178,8 @@ class _ChatsState extends State<Chats> {
   Future<String?> _uploadAudioToFirebase(String filePath) async {
     try {
       final fileName = 'audio_${DateTime.now().millisecondsSinceEpoch}.aac';
-      final ref = FirebaseStorage.instance.ref().child('audioMessages/$fileName');
+      final ref =
+          FirebaseStorage.instance.ref().child('audioMessages/$fileName');
       final uploadTask = await ref.putFile(File(filePath));
       final downloadUrl = await uploadTask.ref.getDownloadURL();
       return downloadUrl;
@@ -192,6 +217,7 @@ class _ChatsState extends State<Chats> {
     _timer = Timer.periodic(const Duration(seconds: 2), (_) {
       fetchmessages();
       fetchchattheme();
+      fetchblockedusers();
     });
   }
 
@@ -207,16 +233,29 @@ class _ChatsState extends State<Chats> {
         ),
         title: Row(
           children: [
-            CircleAvatar(radius: 20, backgroundImage: NetworkImage(widget.PFP)),
+            CircleAvatar(
+                radius: 20,
+                backgroundImage: NetworkImage(isblocked
+                    ? "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
+                    : widget.PFP)),
             const SizedBox(width: 10),
             InkWell(
-                onTap: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => ChatsCustomise(PFP: widget.PFP,
-                      ChatID: widget.ChatID,
-                      username: widget.username,
-                      UID: widget.UID),));
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChatsCustomise(
+                            PFP: widget.PFP,
+                            ChatID: widget.ChatID,
+                            username: widget.username,
+                            UID: widget.UID),
+                      ));
                 },
-                child: Text(widget.username, style: GoogleFonts.poppins(color: Colors.white,fontWeight: FontWeight.w400,fontSize: 18))),
+                child: Text(isblocked ? 'VistaFeedd User' : widget.username,
+                    style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 18))),
           ],
         ),
       ),
@@ -235,11 +274,14 @@ class _ChatsState extends State<Chats> {
                   itemBuilder: (context, i) {
                     bool isSender = messagesender[i] == _auth.currentUser!.uid;
                     return Row(
-                      mainAxisAlignment:
-                      isSender ? MainAxisAlignment.end : MainAxisAlignment.start,
+                      mainAxisAlignment: isSender
+                          ? MainAxisAlignment.end
+                          : MainAxisAlignment.start,
                       children: [
                         if (!isSender)
-                          CircleAvatar(radius: 20, backgroundImage: NetworkImage(widget.PFP)),
+                          CircleAvatar(
+                              radius: 20,
+                              backgroundImage: NetworkImage(widget.PFP)),
                         if (messages[i].isNotEmpty)
                           Container(
                             margin: const EdgeInsets.all(8.0),
@@ -262,9 +304,11 @@ class _ChatsState extends State<Chats> {
                               borderRadius: BorderRadius.circular(8.0),
                             ),
                             child: IconButton(
-                              icon: const Icon( CupertinoIcons.play_circle, color: Colors.white),
+                              icon: const Icon(CupertinoIcons.play_circle,
+                                  color: Colors.white),
                               onPressed: () async {
-                                await _player.startPlayer(fromURI: audioLinks[i]);
+                                await _player.startPlayer(
+                                    fromURI: audioLinks[i]);
                               },
                             ),
                           ),
@@ -273,44 +317,63 @@ class _ChatsState extends State<Chats> {
                   },
                 ),
               ),
-              Container(
-                color: _isListening ? Colors.purple : Colors.grey[900],
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: _isListening
-                          ? Text('Listening...', style: GoogleFonts.poppins(color: Colors.white))
-                          : TextField(
-                        controller: _messageController,
-                        decoration: InputDecoration(
-                          hintText: 'Type a message...',
-                          hintStyle: GoogleFonts.poppins(color: Colors.white),
-                        ),
-                        style: GoogleFonts.poppins(color: Colors.white),
+              isblocked
+                  ? Container(
+                      width: MediaQuery.sizeOf(context).width,
+                      height: 50,
+                      color: Colors.blue,
+                      child: Center(
+                          child: Text(
+                        'This person is unavailable on VistaFeedd.',
+                        style: GoogleFonts.poppins(
+                            color: Colors.black, fontWeight: FontWeight.w500),
+                      )),
+                    )
+                  : Container(
+                      color: _isListening ? Colors.purple : Colors.grey[900],
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: _isListening
+                                ? Text('Listening...',
+                                    style: GoogleFonts.poppins(
+                                        color: Colors.white))
+                                : TextField(
+                                    controller: _messageController,
+                                    decoration: InputDecoration(
+                                      hintText: 'Type a message...',
+                                      hintStyle: GoogleFonts.poppins(
+                                          color: Colors.white),
+                                    ),
+                                    style: GoogleFonts.poppins(
+                                        color: Colors.white),
+                                  ),
+                          ),
+                          GestureDetector(
+                            onLongPress: () async {
+                              setState(() => _isListening = true);
+                              final tempDir = await getTemporaryDirectory();
+                              _audioFilePath =
+                                  '${tempDir.path}/voice_recording.aac';
+                              await _recorder.startRecorder(
+                                  toFile: _audioFilePath);
+                            },
+                            onLongPressUp: () async {
+                              setState(() => _isListening = false);
+                              await _stopRecordingAndUpload();
+                            },
+                            child:
+                                Icon(CupertinoIcons.mic, color: Colors.white),
+                          ),
+                          if (!_isListening)
+                            IconButton(
+                              icon: const Icon(Icons.send, color: Colors.white),
+                              onPressed: sendMessage,
+                            ),
+                        ],
                       ),
                     ),
-                    GestureDetector(
-                      onLongPress: () async {
-                        setState(() => _isListening = true);
-                        final tempDir = await getTemporaryDirectory();
-                        _audioFilePath = '${tempDir.path}/voice_recording.aac';
-                        await _recorder.startRecorder(toFile: _audioFilePath);
-                      },
-                      onLongPressUp: () async {
-                        setState(() => _isListening = false);
-                        await _stopRecordingAndUpload();
-                      },
-                      child: Icon(CupertinoIcons.mic, color: Colors.white),
-                    ),
-                    if (!_isListening)
-                      IconButton(
-                        icon: const Icon(Icons.send, color: Colors.white),
-                        onPressed: sendMessage,
-                      ),
-                  ],
-                ),
-              ),
             ],
           ),
         ],
