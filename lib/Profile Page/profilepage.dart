@@ -241,7 +241,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 onTap: (){
                   Navigator.push(context, MaterialPageRoute(builder: (context) => LoggedInDevices(name: usernames),));
                 },
-                child: const Icon(Icons.mobile_friendly,color: Colors.white,)
+                child: const Icon(Icons.security,color: Colors.white,)
               ),
               const SizedBox(
                 width: 10,
