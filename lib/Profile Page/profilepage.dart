@@ -9,6 +9,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vistafeedd/HomePage/homepage.dart';
 import 'package:video_player/video_player.dart';
+import 'package:vistafeedd/Login%20Activity/devices_login.dart';
 import 'package:vistafeedd/Login%20And%20Signup%20Page/loginpage.dart';
 import 'package:vistafeedd/Post%20Details%20Page/postdetails.dart';
 import 'package:vistafeedd/Profile%20Page%20Details/followerspage.dart';
@@ -238,13 +239,9 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               InkWell(
                 onTap: (){
-                  // Navigator.push(context, MaterialPageRoute(builder: (context) => CreateStory(),));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => LoggedInDevices(name: usernames),));
                 },
-                child: SizedBox(
-                  height: 22,
-                  width: 22,
-                  child: SvgPicture.string('<svg aria-label="Settings" class="x1lliihq x1n2onr6 x5n08af" fill="white" height="24" role="img" viewBox="0 0 24 24" width="24"><title>Settings</title><line fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="3" x2="21" y1="4" y2="4"></line><line fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="3" x2="21" y1="12" y2="12"></line><line fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="3" x2="21" y1="20" y2="20"></line></svg>'),
-                ),
+                child: const Icon(Icons.mobile_friendly,color: Colors.white,)
               ),
               const SizedBox(
                 width: 10,
