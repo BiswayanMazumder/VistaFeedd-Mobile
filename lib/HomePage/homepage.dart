@@ -408,15 +408,58 @@ class _HomePageState extends State<HomePage> {
       print("CID $commentname");
     }
   }
-
+  bool _iswrite=false;
+  String _sessionid='';
+  Future<void>checksessionid()async{
+    await fetchdevicedetails();
+    List sids=[];
+    List deviceid=[];
+    List sessionid=[];
+    final docsnap=await _firestore.collection('Session IDs').doc(_auth.currentUser!.uid).get();
+    if(docsnap.exists) {
+      setState(() {
+        sids = docsnap.data()?['Session ID'];
+      });
+    }
+    print('SIDS $sids');
+    for(int i=0;i<sids.length;i++){
+      final Docsnap=await _firestore.collection('Session Details').doc(sids[i]).get();
+      if(Docsnap.exists){
+        setState(() {
+          deviceid.add(Docsnap.data()?['Device ID']);
+          sessionid.add(Docsnap.data()?['Session ID']);
+        });
+      }
+    }
+    if(!deviceid.contains(_devicename)){
+      setState(() {
+        _iswrite=true;
+      });
+    }else{
+      int index=deviceid.indexOf(_devicename);
+      setState(() {
+        _sessionid=sids[0];
+      });
+      if (kDebugMode) {
+        print('Device ID found at $_sessionid');
+      }
+    }
+  }
+  Future<void>updateactivestatus()async{
+    await checksessionid();
+    await _firestore.collection('Session Details').doc(_sessionid).update({
+      'Last Accessed':FieldValue.serverTimestamp()
+    });
+  }
   @override
   void initState() {
     super.initState();
+    checksessionid();
     fetchdata();
     _getAreaName();
+    updateactivestatus();
     fetchdevicedetails();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

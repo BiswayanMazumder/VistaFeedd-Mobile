@@ -111,6 +111,7 @@ class _LoginPageState extends State<LoginPage> {
   final FirebaseAuth _auth=FirebaseAuth.instance;
   final FirebaseFirestore _firestore=FirebaseFirestore.instance;
   bool _iswrite=false;
+  String _sessionid='';
   Future<void>checkwhethertowrite(String userid)async{
     await fetchdevicedetails();
     if (kDebugMode) {
@@ -118,6 +119,7 @@ class _LoginPageState extends State<LoginPage> {
     }
     List sids=[];
     List deviceid=[];
+    List sessionid=[];
     final docsnap=await _firestore.collection('Session IDs').doc(userid).get();
     if(docsnap.exists) {
       setState(() {
@@ -130,10 +132,15 @@ class _LoginPageState extends State<LoginPage> {
       if(Docsnap.exists){
         setState(() {
           deviceid.add(Docsnap.data()?['Device ID']);
+          sessionid.add(Docsnap.data()?['Session ID']);
         });
       }
     }
     if(!deviceid.contains(_devicename)){
+      int index=deviceid.indexOf(_devicename);
+      if (kDebugMode) {
+        print('Device ID found at $index');
+      }
       setState(() {
         _iswrite=true;
       });
